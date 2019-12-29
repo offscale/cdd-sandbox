@@ -5,3 +5,8 @@ build:
 
 serve: build
 	http-server
+
+setup:
+	npm install
+	npm link slm-cli
+	npm link http-server
