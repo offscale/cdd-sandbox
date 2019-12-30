@@ -1,0 +1,24 @@
+// {
+//     "compilerOptions": {
+//       "sourceMap": true,
+//       "module": "commonjs",
+//       "outDir": "build",
+//       "esModuleInterop": true,
+//       "removeComments": true,
+//       "resolveJsonModule": true,
+//       "experimentalDecorators": true,
+//       "strict": false,
+//       "target": "es5",
+//       "lib": [
+//         "dom",
+//         "es6"
+//       ]
+//     },
+//     "include": [
+//       "src/**/*"
+//     ],
+//     "exclude": [
+//       "node_modules"
+//     ],
+//     "compileOnSave": false
+//   }

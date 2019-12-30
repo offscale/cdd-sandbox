@@ -1,4 +1,14 @@
+var JsonRpcWs = require('json-rpc-ws/browser');
+
 window.onload = () => {
-  console.log("hello");
-  document.body.textContent = "typescript loaded";
+    document.body.textContent = "typescript loaded";
+
+    var client = JsonRpcWs.createClient();
+
+    client.connect('ws://localhost:8080', function connected () {
+        client.send('list-models', { limit: 0 }, function mirrorReply (error, reply) {
+            document.body.textContent = reply;
+            // console.log('reply -> ', reply);
+        });
+    });
 };
