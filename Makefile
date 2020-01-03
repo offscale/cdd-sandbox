@@ -10,7 +10,7 @@ build:
 	cp src/*.ico public/
 
 serve: clean build
-	http-server
+	http-server --port 80
 
 setup:
 	npm install
