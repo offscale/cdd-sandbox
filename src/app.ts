@@ -23,7 +23,7 @@ window.onload = () => {
                 console.log(model);
             }
 
-            let model_names = reply["models"].map(function(model) { return model["name"]; });
+            let model_names = reply["models"].map(function(model) { return "<li>"+model["name"]+"</li>" });
             let codebox = document.getElementById("sidebar");
             codebox.textContent = model_names;
         });
