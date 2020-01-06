@@ -5,7 +5,9 @@
     "@types/node": "^13.1.1",
     "http-server": "^0.12.0",
     "json-rpc-ws": "^7.0.1",
+    "simple-js-tree-view": "^1.0.1",
     "slm-cli": "^0.2.0",
+    "treeview": "0.0.3",
     "typescript-require": "^0.2.10"
   },
   "scripts": {

@@ -1,3 +1,19 @@
+{
+    "allowJs": true
+}
+
+// {
+//     "compilerOptions": {
+//       "allowJs": true
+//       "module": "CommonJS",
+//       "noImplicitAny": true,
+//       "target": "es6"
+//     },
+//     "exclude": [
+//       "node_modules"
+//     ]
+//   }
+
 // {
 //     "compilerOptions": {
 //       "sourceMap": true,
