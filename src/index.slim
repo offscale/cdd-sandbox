@@ -22,21 +22,27 @@ html
 
     /* tab bar */
     .tab-bar { background-color: #333; padding: 10px 20px 0px 20px; }
-    .tab-bar--tab { background-color: #555; line-height: 50px; padding: 0px 20px; margin: 0px 2px; font-weight: bold; color: white; }
-    .tab-bar--tab.active { background-color: #DDD; color: #333; }
+    .tab-bar--tab { background-color: #555; line-height: 50px; padding: 0px 20px; margin: 0px 2px; font-weight: bold; color: white; cursor: pointer; }
+    .tab-bar--tab:hover { background-color: #CCC; }
+    .tab-bar--tab.active { background-color: #888; color: #333; }
 
     /* sidebar */
     #sidebar { background-color: #EEE; height: 100%; padding: 20px 0; }
-    .sidebar--title { background-color: #DDD; color: #555; font-size: 12px; text-transform: uppercase; padding: 2px 20px; font-weight: bold; }
-    #sidebar .selectable-item { font-weight: bold; padding: 15px 20px; color: #222; }
+    .sidebar--title { color: #555; font-size: 12px; text-transform: uppercase; padding: 2px 20px; font-weight: bold; }
+    #sidebar .selectable-item { font-weight: bold; font-size: 13px; padding: 10px 20px; color: #222; cursor: pointer; }
+    #sidebar .selectable-item:hover { background-color: #DDD; }
 
   body
     section.header Compiler Driven Development
+
     section.tab-bar
       .column.tab-bar--tab.active
         | Typescript
       .column.tab-bar--tab
+        | Swift
+      .column.tab-bar--tab
         | Rust
+        
     section.content
       #sidebar.column
         .sidebar--title
