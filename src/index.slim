@@ -10,17 +10,33 @@ html
     * { box-sizing: border-box }
     html, body { width: 100%; height: 100%; }
     body { margin: 0; font-family: Helvetica; }
-    .header { background-color: purple; line-height: 30px; font-weight: bold; padding: 10px 20px; }
+    .header { background-color: purple; line-height: 60px; font-weight: bold; padding: 10px 20px; color: white; font-size: 20px; }
     #code { background-color: red; margin: 0; }
-    #sidebar, #editor { padding: 20px; }
+    #editor { padding: 20px; }
+    .content { height: 100%; }
 
     /* flex */
     body { display: flex; flex-direction: column; }
     section { display: flex; flex-direction: row; }
     #sidebar { width: 250px }
 
+    /* tab bar */
+    .tab-bar { background-color: #333; padding: 10px 20px 0px 20px; }
+    .tab-bar--tab { background-color: #555; line-height: 50px; padding: 0px 20px; margin: 0px 2px; font-weight: bold; color: white; }
+    .tab-bar--tab.active { background-color: #DDD; color: #333; }
+
+    /* sidebar */
+    #sidebar { background-color: #EEE; height: 100%; padding: 20px 0; }
+    .sidebar--title { background-color: #DDD; color: #555; font-size: 12px; text-transform: uppercase; padding: 2px 20px; font-weight: bold; }
+    #sidebar .selectable-item { font-weight: bold; padding: 15px 20px; color: #222; }
+
   body
     section.header Compiler Driven Development
+    section.tab-bar
+      .column.tab-bar--tab.active
+        | Typescript
+      .column.tab-bar--tab
+        | Rust
     section.content
       #sidebar.column
         .sidebar--title

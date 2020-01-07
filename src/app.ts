@@ -8,25 +8,33 @@ window.onload = () => {
     var host    = 'ws://localhost:8080';
     var client  = JsonRpcWs.createClient();
 
-    // let btn = document.getElementById("coolbutton");
-    // btn.addEventListener("click", (e:Event) => this.getTrainingName(4));
-
-    // jstree.init().Jstree({id: 'sidebar'});
-
     client.connect(host, function connected () {
         console.log("connected to ", host);
-        client.send('list-models', { limit: 0 }, function mirrorReply (error, reply) {
+        client.send('list-models', { limit: 0 }, function mirrorReply (error: any, reply: { [x: string]: any; }) {
             console.log('reply -> ', reply);
             // document.body.textContent = reply["models"]; 
 
             for (let model of reply["models"]) {
-                console.log(model);
+                appendSidebarButton("sidebar", model["name"]);
             }
 
-            let model_names = reply["models"].map(function(model) { return "<li>"+model["name"]+"</li>" });
-            let codebox = document.getElementById("sidebar");
-            codebox.textContent = model_names;
+            // let model_names = reply["models"].map(function(model) { return "<li>"+model["name"]+"</li>" });
+            // let codebox = document.getElementById("sidebar");
+            // codebox.textContent = model_names;
         });
     });
 };
 
+function appendSidebarButton(parentId: string, name: any) {
+    let parent = document.getElementById(parentId);
+    parent.appendChild(createElement("div", ["selectable-item", "model"], document.createTextNode(name)));
+}
+
+function createElement(type: string, classes: string[], content: Node) {
+    var element = document.createElement(type);
+    element.appendChild(content);
+    for (const klass of classes) {
+        element.classList.add(klass);
+    }
+    return element;
+}
