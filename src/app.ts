@@ -1,5 +1,19 @@
+
+
 window.onload = () => {
     console.log("window loaded");
+
+    // ace editor init
+    var ace = require('brace');
+    require('brace/mode/javascript');
+    require('brace/theme/monokai');
+    
+    var editor = ace.edit('javascript-editor');
+    editor.getSession().setMode('ace/mode/javascript');
+    editor.setTheme('ace/theme/monokai');
+    // end editor init
+
+
     var JsonRpcWs   = require('json-rpc-ws/browser');
     // var jstree      = require('./treeview');
     // import * as jsTree from 'treeview';
