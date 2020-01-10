@@ -6,9 +6,9 @@ build:
 	tsc src/*.ts --outDir build
 	browserify build/app.js -o public/app.js
 	slm --input src/index.slim --output public/index.html
-	- cp src/*.css public/
-	- cp src/*.ico public/
-	- cp src/*.js public/
+	- cp src/*.css public/ 2> /dev/null
+	- cp src/*.ico public/ 2> /dev/null
+	- cp src/*.js public/ 2>/dev/null
 
 serve: clean build
 	http-server --port 8888
@@ -18,3 +18,6 @@ setup:
 	npm link slm-cli
 	npm link http-server
 	npm link browserify
+
+watch:
+	tsc -w src/*.ts --outDir build
