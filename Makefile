@@ -11,7 +11,7 @@ build:
 	- cp src/*.js public/ 2>/dev/null
 	- cp build/*.map public/ 2>/dev/null
 
-serve: clean build
+server: clean build
 	http-server --port 8888
 
 setup:
