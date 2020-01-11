@@ -16,11 +16,20 @@ window.onload = () => {
     console.log("get_service called");
     var client = JsonRpcWs.createClient();
     client.connect(host, function connected() {
-      client.send(fn, { limit: 0 }, function mirrorReply(
+      client.send(fn, {}, function mirrorReply(
         error: any,
         reply: { [x: string]: any }
       ) {
-        editor.setValue("loaded");
+        console.log("reply -> " + reply);
+        if (reply != undefined) {
+          let code = reply
+            .map(function(model) {
+              return model["code"];
+            })
+            .join("\n\n");
+          console.log(code);
+          editor.setValue(code);
+        }
       });
     });
   }

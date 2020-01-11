@@ -3,12 +3,13 @@ clean:
 	- rm public/*
 
 build:
-	tsc src/*.ts --outDir build
-	browserify build/app.js -o public/app.js
+	tsc -sourcemap src/*.ts --outDir build
+	browserify --debug build/app.js -o public/app.js
 	slm --input src/index.slim --output public/index.html
 	- cp src/*.css public/ 2> /dev/null
 	- cp src/*.ico public/ 2> /dev/null
 	- cp src/*.js public/ 2>/dev/null
+	- cp build/*.map public/ 2>/dev/null
 
 serve: clean build
 	http-server --port 8888
