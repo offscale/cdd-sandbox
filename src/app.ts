@@ -27,15 +27,7 @@ function rpc_call(
   });
 }
 
-window.onload = () => {
-  console.log("window loaded");
-
-  // ace editor init
-  var editor = ace.edit("javascript-editor");
-  editor.getSession().setMode("ace/mode/yaml");
-  editor.setTheme("ace/theme/monokai");
-  // end editor init
-
+function update(editor) {
   // openapi default
   rpc_call("ws://localhost:7777", "default", {}, response => {
     let code = response["code"];
@@ -53,6 +45,17 @@ window.onload = () => {
       console.log(response);
     }
   });
+}
+
+window.onload = () => {
+  console.log("window loaded");
+
+  // ace editor init
+  var editor = ace.edit("javascript-editor");
+  editor.getSession().setMode("ace/mode/yaml");
+  editor.setTheme("ace/theme/monokai");
+  update(editor);
+  // end editor init
 
   // listen for keyboard shortcuts
   document.addEventListener(
@@ -69,6 +72,7 @@ window.onload = () => {
         // Even though event.key is not 'Control' (e.g., 'a' is pressed),
         // event.ctrlKey may be true if Ctrl key is pressed at the same time.
         alert(`Combination of ctrlKey + ${keyName}`);
+        update(editor);
         event.preventDefault();
       } else {
         // alert(`Key pressed ${keyName}`);
