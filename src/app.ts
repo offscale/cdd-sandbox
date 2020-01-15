@@ -42,8 +42,12 @@ window.onload = () => {
     if (code != undefined) {
       editor.setValue(code);
       editor.clearSelection();
+
       rpc_call("ws://localhost:7777", "parse", { code }, response => {
-        console.log(response);
+        refreshSidebar(response["models"]);
+        // for (let model of response["models"]) {
+        //   appendSidebarButton("sidebar", model["name"]);
+        // }
       });
     } else {
       console.log(response);
@@ -118,15 +122,21 @@ window.onload = () => {
   // }
 };
 
-function appendSidebarButton(parentId: string, name: any) {
-  let parent = document.getElementById(parentId);
-  parent.appendChild(
-    createElement(
-      "div",
-      ["selectable-item", "model"],
-      document.createTextNode(name)
-    )
-  );
+function refreshSidebar(models: any) {
+  let sidebar = document.getElementById("sidebar");
+  let itemContainer = sidebar.querySelector(".sidebar--items.models");
+  itemContainer.textContent = "";
+  for (let model of models) {
+    itemContainer.appendChild(
+      createElement(
+        "div",
+        ["selectable-item", "model"],
+        // document.createTextNode(model["name"])
+        document.createTextNode(model)
+      )
+    );
+    console.log(model);
+  }
 }
 
 function createElement(type: string, classes: string[], content: Node) {
