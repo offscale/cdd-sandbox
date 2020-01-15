@@ -54,6 +54,29 @@ window.onload = () => {
     }
   });
 
+  // listen for keyboard shortcuts
+  document.addEventListener(
+    "keydown",
+    event => {
+      const keyName = event.key;
+
+      // do not alert when only Control key is pressed.
+      if (keyName === "Control") {
+        return;
+      }
+
+      if (event.ctrlKey && keyName == "s") {
+        // Even though event.key is not 'Control' (e.g., 'a' is pressed),
+        // event.ctrlKey may be true if Ctrl key is pressed at the same time.
+        alert(`Combination of ctrlKey + ${keyName}`);
+        event.preventDefault();
+      } else {
+        // alert(`Key pressed ${keyName}`);
+      }
+    },
+    false
+  );
+
   // function get_service(host: String, method: String) {
   //   console.log("get_service called with: " + method);
   //   var client = JsonRpcWs.createClient();
