@@ -32,6 +32,12 @@ function updateState() {
   updateEditor();
 }
 
+function saveState() {
+  if (appState.selectedTab) {
+    appState.services[appState.selectedTab].code = appState.editor.getValue();
+  }
+}
+
 function updateTabs() {
   document.querySelectorAll(`.tab-bar--tab.active`).forEach(value => {
     value.classList.remove("active");
@@ -87,8 +93,10 @@ function setDefaultEditorState() {
 }
 
 function updateSidebar(editor) {
+  let service = appState.services[appState.selectedTab];
+
   let code = editor.getValue();
-  rpc_call("ws://localhost:7777", "parse", { code }, response => {
+  rpc_call(service.server, "parse", { code }, response => {
     refreshSidebar(response["models"]);
     // for (let model of response["models"]) {
     //   appendSidebarButton("sidebar", model["name"]);
@@ -112,6 +120,7 @@ window.onload = () => {
   document
     .querySelector(".tab-bar--tab.openapi")
     .addEventListener("click", event => {
+      saveState();
       appState.selectedTab = "openapi";
       updateState();
     });
@@ -119,13 +128,10 @@ window.onload = () => {
   document
     .querySelector(".tab-bar--tab.typescript")
     .addEventListener("click", event => {
-      rpc_call("ws://localhost:7778", "generateCode", {}, response => {
-        editor.getSession().setMode("ace/mode/typescript");
-        // updateEditor(editor, response);
-
-        appState.selectedTab = "typescript";
-        updateState();
-      });
+      // save the current code state
+      saveState();
+      appState.selectedTab = "typescript";
+      updateState();
     });
 
   // listen for keyboard shortcuts
