@@ -5,6 +5,29 @@ require("brace/mode/yaml");
 require("brace/mode/typescript");
 require("brace/theme/monokai");
 
+var appState = {
+  selectedTab: "openapi",
+  services: {
+    openapi: { server: "ws://localhost:7777", code: null },
+    typescript: {
+      server: "ws://localhost:7778",
+      code: null
+    }
+  }
+};
+
+function updateState() {
+  console.log("updating ui state");
+  updateTabs(appState.selectedTab);
+}
+
+function updateTabs(selected) {
+  document.querySelectorAll(`.tab-bar--tab.active`).forEach(value => {
+    value.classList.remove("active");
+  });
+  document.querySelector(`.tab-bar--tab.${selected}`).classList.add("active");
+}
+
 // implement
 function rpc_call(
   host: String,
@@ -12,7 +35,7 @@ function rpc_call(
   params: any,
   callback: (response: any) => void
 ) {
-  console.log("rpc_call: " + host + method);
+  console.log(`rpc_call: ${host} -> ${method}`);
   var client = JsonRpcWs.createClient();
   client.connect(host, function connected() {
     client.send(method, params, function mirrorReply(
@@ -68,12 +91,24 @@ window.onload = () => {
   setDefaultEditorState(editor);
   // end editor init
 
+  updateState();
+
+  document
+    .querySelector(".tab-bar--tab.openapi")
+    .addEventListener("click", event => {
+      appState.selectedTab = "openapi";
+      updateState();
+    });
+
   document
     .querySelector(".tab-bar--tab.typescript")
     .addEventListener("click", event => {
       rpc_call("ws://localhost:7778", "generateCode", {}, response => {
         editor.getSession().setMode("ace/mode/typescript");
         updateEditor(editor, response);
+
+        appState.selectedTab = "typescript";
+        updateState();
       });
     });
 
