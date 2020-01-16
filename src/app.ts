@@ -2,6 +2,7 @@ var JsonRpcWs = require("json-rpc-ws/browser");
 var ace = require("brace");
 require("brace/mode/javascript");
 require("brace/mode/yaml");
+require("brace/mode/typescript");
 require("brace/theme/monokai");
 
 // implement
@@ -30,15 +31,20 @@ function rpc_call(
 function setDefaultEditorState(editor) {
   // openapi default
   rpc_call("ws://localhost:7777", "default", {}, response => {
-    let code = response["code"];
-    if (code != undefined) {
-      editor.setValue(code);
-      editor.clearSelection();
-      updateSidebar(editor);
-    } else {
-      console.log(response);
-    }
+    updateEditor(editor, response);
+    updateSidebar(editor);
   });
+}
+
+function updateEditor(editor, response) {
+  let code = response["code"];
+  if (code != undefined) {
+    editor.setValue(code);
+    editor.clearSelection();
+  } else {
+    console.log("response does not contain a code key");
+    console.log(response);
+  }
 }
 
 function updateSidebar(editor) {
@@ -60,6 +66,15 @@ window.onload = () => {
   editor.setTheme("ace/theme/monokai");
   setDefaultEditorState(editor);
   // end editor init
+
+  document
+    .querySelector(".tab-bar--tab.typescript")
+    .addEventListener("click", event => {
+      rpc_call("ws://localhost:7778", "generateCode", {}, response => {
+        editor.getSession().setMode("ace/mode/typescript");
+        updateEditor(editor, response);
+      });
+    });
 
   // listen for keyboard shortcuts
   document.addEventListener(
