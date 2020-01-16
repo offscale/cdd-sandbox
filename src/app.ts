@@ -27,23 +27,27 @@ function rpc_call(
   });
 }
 
-function update(editor) {
+function setDefaultEditorState(editor) {
   // openapi default
   rpc_call("ws://localhost:7777", "default", {}, response => {
     let code = response["code"];
     if (code != undefined) {
       editor.setValue(code);
       editor.clearSelection();
-
-      rpc_call("ws://localhost:7777", "parse", { code }, response => {
-        refreshSidebar(response["models"]);
-        // for (let model of response["models"]) {
-        //   appendSidebarButton("sidebar", model["name"]);
-        // }
-      });
+      updateSidebar(editor);
     } else {
       console.log(response);
     }
+  });
+}
+
+function updateSidebar(editor) {
+  let code = editor.getValue();
+  rpc_call("ws://localhost:7777", "parse", { code }, response => {
+    refreshSidebar(response["models"]);
+    // for (let model of response["models"]) {
+    //   appendSidebarButton("sidebar", model["name"]);
+    // }
   });
 }
 
@@ -54,7 +58,7 @@ window.onload = () => {
   var editor = ace.edit("javascript-editor");
   editor.getSession().setMode("ace/mode/yaml");
   editor.setTheme("ace/theme/monokai");
-  update(editor);
+  setDefaultEditorState(editor);
   // end editor init
 
   // listen for keyboard shortcuts
@@ -68,14 +72,10 @@ window.onload = () => {
         return;
       }
 
+      // keypress of ctrl+s
       if (event.ctrlKey && keyName == "s") {
-        // Even though event.key is not 'Control' (e.g., 'a' is pressed),
-        // event.ctrlKey may be true if Ctrl key is pressed at the same time.
-        alert(`Combination of ctrlKey + ${keyName}`);
-        update(editor);
+        updateSidebar(editor);
         event.preventDefault();
-      } else {
-        // alert(`Key pressed ${keyName}`);
       }
     },
     false
