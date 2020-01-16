@@ -6,26 +6,50 @@ require("brace/mode/typescript");
 require("brace/theme/monokai");
 
 var appState = {
-  selectedTab: "openapi",
+  selectedTab: null,
+  editor: null,
   services: {
-    openapi: { server: "ws://localhost:7777", code: null },
+    openapi: { server: "ws://localhost:7777", syntax: "yaml", code: "openapi" },
     typescript: {
       server: "ws://localhost:7778",
-      code: null
+      syntax: "typescript",
+      code: "ts"
     }
   }
 };
 
-function updateState() {
-  console.log("updating ui state");
-  updateTabs(appState.selectedTab);
+function fetchCode(service) {
+  console.log("fetching rpc for " + service);
+  let svc = appState.services[service];
+  rpc_call(svc.server, "generateCode", {}, response => {
+    svc.code = response["code"];
+  });
 }
 
-function updateTabs(selected) {
+function updateState() {
+  console.log("updating ui state");
+  updateTabs();
+  updateEditor();
+}
+
+function updateTabs() {
   document.querySelectorAll(`.tab-bar--tab.active`).forEach(value => {
     value.classList.remove("active");
   });
-  document.querySelector(`.tab-bar--tab.${selected}`).classList.add("active");
+  if (appState.selectedTab) {
+    document
+      .querySelector(`.tab-bar--tab.${appState.selectedTab}`)
+      .classList.add("active");
+  }
+}
+
+function updateEditor() {
+  if (appState.selectedTab) {
+    let service = appState.services[appState.selectedTab];
+    appState.editor.getSession().setMode(`ace/mode/${service.syntax}`);
+    appState.editor.setValue(service.code);
+    appState.editor.clearSelection();
+  }
 }
 
 // implement
@@ -51,23 +75,15 @@ function rpc_call(
   });
 }
 
-function setDefaultEditorState(editor) {
-  // openapi default
-  rpc_call("ws://localhost:7777", "default", {}, response => {
-    updateEditor(editor, response);
-    updateSidebar(editor);
-  });
-}
+function setDefaultEditorState() {
+  rpc_call(appState.services.openapi.server, "default", {}, response => {
+    appState.selectedTab = "openapi";
+    appState.services.openapi.code = response["code"];
 
-function updateEditor(editor, response) {
-  let code = response["code"];
-  if (code != undefined) {
-    editor.setValue(code);
-    editor.clearSelection();
-  } else {
-    console.log("response does not contain a code key");
-    console.log(response);
-  }
+    fetchCode("typescript");
+
+    updateState();
+  });
 }
 
 function updateSidebar(editor) {
@@ -86,9 +102,9 @@ window.onload = () => {
   // ace editor init
   var editor = ace.edit("javascript-editor");
   editor.$blockScrolling = Infinity;
-  editor.getSession().setMode("ace/mode/yaml");
   editor.setTheme("ace/theme/monokai");
-  setDefaultEditorState(editor);
+  appState.editor = editor;
+  setDefaultEditorState();
   // end editor init
 
   updateState();
@@ -105,7 +121,7 @@ window.onload = () => {
     .addEventListener("click", event => {
       rpc_call("ws://localhost:7778", "generateCode", {}, response => {
         editor.getSession().setMode("ace/mode/typescript");
-        updateEditor(editor, response);
+        // updateEditor(editor, response);
 
         appState.selectedTab = "typescript";
         updateState();
