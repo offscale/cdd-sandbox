@@ -19,7 +19,6 @@ var appState = {
 };
 
 function fetchCode(service) {
-  console.log("fetching rpc for " + service);
   let svc = appState.services[service];
   rpc_call(svc.server, "generateCode", {}, response => {
     svc.code = response["code"];
@@ -75,6 +74,7 @@ function rpc_call(
       if (error != null) {
         console.log(error);
       } else {
+        console.log(reply);
         callback(reply);
       }
     });
