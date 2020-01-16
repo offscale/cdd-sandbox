@@ -62,6 +62,7 @@ window.onload = () => {
 
   // ace editor init
   var editor = ace.edit("javascript-editor");
+  editor.$blockScrolling = Infinity;
   editor.getSession().setMode("ace/mode/yaml");
   editor.setTheme("ace/theme/monokai");
   setDefaultEditorState(editor);
