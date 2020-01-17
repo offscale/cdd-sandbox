@@ -91,7 +91,7 @@ function updateSidebar() {
         "div",
         ["selectable-item", "model"],
         // document.createTextNode(model["name"])
-        document.createTextNode(model)
+        document.createTextNode(model.name)
       )
     );
   }
