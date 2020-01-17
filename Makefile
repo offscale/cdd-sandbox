@@ -9,6 +9,7 @@ build:
 	- cp src/*.css public/ 2> /dev/null
 	- cp src/*.ico public/ 2> /dev/null
 	- cp src/*.js public/ 2>/dev/null
+	- cp src/*.svg public/ 2>/dev/null
 	- cp build/*.map public/ 2>/dev/null
 
 server: clean build

@@ -39,7 +39,8 @@ function parseCode() {
   let svc = appState.services[appState.selectedTab];
 
   rpc_call(svc.server, "parse", { code: svc.code }, response => {
-    appState.project.models = response["models"];
+    // note: this may do well with a check for the 'models' and 'requests' keys...
+    appState.project = response;
     updateState();
 
     // sync across other languages
