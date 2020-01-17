@@ -8,27 +8,47 @@ require("brace/theme/monokai");
 var appState = {
   selectedTab: null,
   editor: null,
+  project: {
+    models: [],
+    requests: []
+  },
   services: {
-    openapi: { server: "ws://localhost:7777", syntax: "yaml", code: "openapi" },
+    openapi: {
+      server: "ws://localhost:7777",
+      syntax: "yaml",
+      code: "nothing fetched."
+    },
     typescript: {
       server: "ws://localhost:7778",
       syntax: "typescript",
-      code: "ts"
+      code: "nothing fetched."
     }
   }
 };
 
-function fetchCode(service) {
+function fetchCode(service: string) {
   let svc = appState.services[service];
+
   rpc_call(svc.server, "generateCode", {}, response => {
     svc.code = response["code"];
+    updateState();
+  });
+}
+
+function parseCode() {
+  let svc = appState.services[appState.selectedTab];
+
+  rpc_call(svc.server, "parse", { code: svc.code }, response => {
+    appState.project.models = response["models"];
+    updateState();
   });
 }
 
 function updateState() {
-  console.log("updating ui state");
+  console.log(["updating ui state", appState]);
   updateTabs();
   updateEditor();
+  updateSidebar();
 }
 
 function saveState() {
@@ -57,6 +77,34 @@ function updateEditor() {
   }
 }
 
+function updateSidebar() {
+  let sidebar = document.getElementById("sidebar");
+  let itemContainer = sidebar.querySelector(".sidebar--items.models");
+  itemContainer.textContent = "";
+  for (let model of appState.project.models) {
+    itemContainer.appendChild(
+      createElement(
+        "div",
+        ["selectable-item", "model"],
+        // document.createTextNode(model["name"])
+        document.createTextNode(model)
+      )
+    );
+  }
+}
+
+// function updateSidebar(editor) {
+//   let service = appState.services[appState.selectedTab];
+
+//   let code = editor.getValue();
+//   rpc_call(service.server, "parse", { code }, response => {
+//     refreshSidebar(response["models"]);
+//     // for (let model of response["models"]) {
+//     //   appendSidebarButton("sidebar", model["name"]);
+//     // }
+//   });
+// }
+
 // implement
 function rpc_call(
   host: String,
@@ -64,18 +112,19 @@ function rpc_call(
   params: any,
   callback: (response: any) => void
 ) {
-  console.log(`rpc_call: ${host} -> ${method}`);
+  console.log([`rpc_call: ${host} -> ${method}`, params]);
+
   var client = JsonRpcWs.createClient();
   client.connect(host, function connected() {
     client.send(method, params, function mirrorReply(
       error: any,
-      reply: { [x: string]: any }
+      response: { [x: string]: any }
     ) {
       if (error != null) {
-        console.log(error);
+        console.log([`${method} error`, error]);
       } else {
-        console.log(reply);
-        callback(reply);
+        console.log([`${method} response`, response]);
+        callback(response);
       }
     });
   });
@@ -85,22 +134,11 @@ function setDefaultEditorState() {
   rpc_call(appState.services.openapi.server, "default", {}, response => {
     appState.selectedTab = "openapi";
     appState.services.openapi.code = response["code"];
+    parseCode();
 
     fetchCode("typescript");
 
-    updateState();
-  });
-}
-
-function updateSidebar(editor) {
-  let service = appState.services[appState.selectedTab];
-
-  let code = editor.getValue();
-  rpc_call(service.server, "parse", { code }, response => {
-    refreshSidebar(response["models"]);
-    // for (let model of response["models"]) {
-    //   appendSidebarButton("sidebar", model["name"]);
-    // }
+    // updateState();
   });
 }
 
@@ -128,7 +166,6 @@ window.onload = () => {
   document
     .querySelector(".tab-bar--tab.typescript")
     .addEventListener("click", event => {
-      // save the current code state
       saveState();
       appState.selectedTab = "typescript";
       updateState();
@@ -147,30 +184,14 @@ window.onload = () => {
 
       // keypress of ctrl+s
       if (event.ctrlKey && keyName == "s") {
-        updateSidebar(editor);
+        saveState();
+        parseCode();
         event.preventDefault();
       }
     },
     false
   );
 };
-
-function refreshSidebar(models: any) {
-  let sidebar = document.getElementById("sidebar");
-  let itemContainer = sidebar.querySelector(".sidebar--items.models");
-  itemContainer.textContent = "";
-  for (let model of models) {
-    itemContainer.appendChild(
-      createElement(
-        "div",
-        ["selectable-item", "model"],
-        // document.createTextNode(model["name"])
-        document.createTextNode(model)
-      )
-    );
-    console.log(model);
-  }
-}
 
 function createElement(type: string, classes: string[], content: Node) {
   var element = document.createElement(type);
