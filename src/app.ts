@@ -29,7 +29,7 @@ var appState = {
 function fetchCode(service: string) {
   let svc = appState.services[service];
 
-  rpc_call(svc.server, "generateCode", {}, response => {
+  rpc_call(svc.server, "generateCode", appState.project, response => {
     svc.code = response["code"];
     updateState();
   });
@@ -41,6 +41,9 @@ function parseCode() {
   rpc_call(svc.server, "parse", { code: svc.code }, response => {
     appState.project.models = response["models"];
     updateState();
+
+    // sync across other languages
+    fetchCode("typescript");
   });
 }
 
@@ -135,8 +138,6 @@ function setDefaultEditorState() {
     appState.selectedTab = "openapi";
     appState.services.openapi.code = response["code"];
     parseCode();
-
-    fetchCode("typescript");
 
     // updateState();
   });
