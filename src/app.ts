@@ -44,7 +44,11 @@ function parseCode() {
     updateState();
 
     // sync across other languages
-    fetchCode("typescript");
+    for (let service of Object.keys(appState.services)) {
+      if (appState.selectedTab != service) {
+        fetchCode(service);
+      }
+    }
   });
 }
 
