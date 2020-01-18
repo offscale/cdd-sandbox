@@ -90,14 +90,23 @@ function updateSidebar() {
   let itemContainer = sidebar.querySelector(".sidebar--items.models");
   itemContainer.textContent = "";
   for (let model of appState.project.models) {
-    itemContainer.appendChild(
-      createElement(
-        "div",
-        ["selectable-item", "model"],
-        // document.createTextNode(model["name"])
-        document.createTextNode(model.name)
-      )
+    var modelElement = createElement(
+      "div",
+      ["selectable-item", "model"],
+      // document.createTextNode(model["name"])
+      document.createTextNode(model.name)
     );
+    for (let variable of model.vars) {
+      modelElement.appendChild(
+        createElement(
+          "div",
+          ["model-member"],
+          document.createTextNode(`${variable.name}: ${variable.type}`)
+        )
+      );
+    }
+
+    itemContainer.appendChild(modelElement);
   }
 }
 
