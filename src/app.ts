@@ -29,7 +29,7 @@ var appState = {
 function fetchCode(service: string) {
   let svc = appState.services[service];
 
-  rpc_call(svc.server, "generateCode", appState.project, response => {
+  rpc_call(svc.server, "generate", appState.project, response => {
     svc.code = response["code"];
     updateState();
   });
@@ -96,7 +96,7 @@ function updateSidebar() {
       // document.createTextNode(model["name"])
       document.createTextNode(model.name)
     );
-    for (let variable of model.vars) {
+    for (let variable of model.vars || []) {
       modelElement.appendChild(
         createElement(
           "div",
