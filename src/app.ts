@@ -148,13 +148,18 @@ function rpc_call(
 }
 
 function setDefaultEditorState() {
-  rpc_call(appState.services.openapi.server, "default", {}, response => {
-    appState.selectedTab = "openapi";
-    appState.services.openapi.code = response["code"];
-    parseCode();
+  rpc_call(
+    appState.services.openapi.server,
+    "template",
+    { name: "petstore" },
+    response => {
+      appState.selectedTab = "openapi";
+      appState.services.openapi.code = response["code"];
+      parseCode();
 
-    // updateState();
-  });
+      // updateState();
+    }
+  );
 }
 
 window.onload = () => {
