@@ -3,7 +3,7 @@ clean:
 	- rm public/*
 
 build:
-	tsc -sourcemap src/*.ts --outDir build
+	tsc
 	browserify --debug build/app.js -o public/app.js
 	slm --input src/index.slim --output public/index.html
 	- cp src/*.css public/ 2> /dev/null
