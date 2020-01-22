@@ -1,19 +1,11 @@
 clean:
-	- rm build/*
 	- rm public/*
 
 build:
-	tsc
-	browserify --debug build/app.js -o public/app.js
-	slm --input src/index.slim --output public/index.html
-	- cp src/*.css public/ 2> /dev/null
-	- cp src/*.ico public/ 2> /dev/null
-	- cp src/*.js public/ 2>/dev/null
-	- cp src/*.svg public/ 2>/dev/null
-	- cp build/*.map public/ 2>/dev/null
+	npm run build
 
-server: clean build
-	http-server --port 8888
+server:
+	npm run server
 
 setup:
 	npm install
@@ -22,4 +14,4 @@ setup:
 	npm link browserify
 
 watch:
-	tsc -w src/*.ts --outDir build
+	npm run watch

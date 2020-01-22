@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "webpack",
-    "serve": "http-server",
+    "server": "http-server",
     "watch": "webpack-dev-server --watch --progress --colors --config webpack.config.js --host 0.0.0.0"
   },
   "devDependencies": {
