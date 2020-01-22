@@ -3,5 +3,11 @@
 ## Building
 
 ```bash:
-npm run start
+npm run watch
+```
+
+## Installation (Production)
+
+```bash:
+npm run build
 ```

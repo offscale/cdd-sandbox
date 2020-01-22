@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
-    // "module": "system",
+    "module": "commonjs",
+    // "noImplicitAny": true,
+    "target": "es2015",
+
     "esModuleInterop": true,
+    // "skipLibCheck": true,
     // "noImplicitAny": true,
     "removeComments": true,
     // "preserveConstEnums": true,
