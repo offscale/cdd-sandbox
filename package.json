@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack",
     "start": "http-server",
+    "clean": "rm -rf public/* && rm -rf build/*",
     "watch": "webpack-dev-server --watch --progress --colors --config webpack.config.js --host 0.0.0.0"
   },
   "devDependencies": {
