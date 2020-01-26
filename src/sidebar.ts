@@ -4,8 +4,14 @@ let modelsSelector = ".sidebar--items.models";
 let requestsSelector = ".sidebar--items.requests";
 
 export module Sidebar {
+  export function update(state) {
+    addModels(state.project.models);
+    addRequests(state.project.requests);
+  }
+
   export function addRequests(requests) {
     let requestsContainer = document.querySelector(requestsSelector);
+    requestsContainer.textContent = "";
 
     for (let request of requests) {
       var el = DOM.createElement(
@@ -19,6 +25,8 @@ export module Sidebar {
 
   export function addModels(models) {
     let modelsContainer = document.querySelector(modelsSelector);
+    modelsContainer.textContent = "";
+
     for (let model of models) {
       var el = DOM.createElement(
         "div",

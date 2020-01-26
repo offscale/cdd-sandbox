@@ -61,7 +61,7 @@ function updateState() {
   console.log(["updating ui state", appState]);
   updateTabs();
   updateEditor();
-  updateSidebar();
+  Sidebar.update(appState);
 }
 
 function saveState() {
@@ -88,34 +88,6 @@ function updateEditor() {
     appState.editor.setValue(service.code);
     appState.editor.clearSelection();
   }
-}
-
-function updateSidebar() {
-  let sidebar = document.getElementById("sidebar");
-  let itemContainer = sidebar.querySelector(".sidebar--items.models");
-  itemContainer.textContent = "";
-
-  // for (let model of appState.project.models) {
-  //   var modelElement = createElement(
-  //     "div",
-  //     ["selectable-item", "model"],
-  //     // document.createTextNode(model["name"])
-  //     document.createTextNode(model.name)
-  //   );
-  //   for (let variable of model.vars || []) {
-  //     modelElement.appendChild(
-  //       createElement(
-  //         "div",
-  //         ["model-member"],
-  //         document.createTextNode(`${variable.name}: ${variable.type}`)
-  //       )
-  //     );
-  //   }
-
-  //   itemContainer.appendChild(modelElement);
-  // }
-  Sidebar.addModels(appState.project.models);
-  Sidebar.addRequests(appState.project.requests);
 }
 
 // implement

@@ -88,13 +88,18 @@ section {
 #sidebar .selectable-item:hover {
   background-color: #333;
 }
-#sidebar .selectable-item.model {
-  background-image: url("icon--class.svg");
+#sidebar .selectable-item {
   background-repeat: no-repeat;
   background-position-x: 20px;
   background-position-y: 10px;
   background-size: 15px;
   padding-left: 45px;
+}
+#sidebar .selectable-item.model {
+  background-image: url("icon--class.svg");
+}
+#sidebar .selectable-item.request {
+  background-image: url("icon--class.svg");
 }
 #sidebar .model-member {
   font-weight: normal;
