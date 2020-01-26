@@ -4,6 +4,7 @@ require("brace/mode/javascript");
 require("brace/mode/yaml");
 require("brace/mode/typescript");
 require("brace/theme/monokai");
+import { Sidebar } from "./sidebar";
 
 var appState = {
   selectedTab: null,
@@ -16,20 +17,23 @@ var appState = {
     openapi: {
       server: "ws://localhost:7777",
       syntax: "yaml",
-      code: "nothing fetched."
+      code: ""
     },
     typescript: {
       server: "ws://localhost:7778",
       syntax: "typescript",
-      code: "nothing fetched."
+      code: ""
     }
   }
 };
 
 function fetchCode(service: string) {
   let svc = appState.services[service];
+  let params = { project: appState.project, code: svc.code };
 
-  rpc_call(svc.server, "generate", appState.project, response => {
+  // if the code is empty, we should call generate. otherwise, update it.
+
+  rpc_call(svc.server, "update", params, response => {
     svc.code = response["code"];
     updateState();
   });
@@ -37,8 +41,9 @@ function fetchCode(service: string) {
 
 function parseCode() {
   let svc = appState.services[appState.selectedTab];
+  let params = { code: svc.code };
 
-  rpc_call(svc.server, "parse", { code: svc.code }, response => {
+  rpc_call(svc.server, "parse", params, response => {
     // note: this may do well with a check for the 'models' and 'requests' keys...
     appState.project = response;
     updateState();
@@ -89,38 +94,29 @@ function updateSidebar() {
   let sidebar = document.getElementById("sidebar");
   let itemContainer = sidebar.querySelector(".sidebar--items.models");
   itemContainer.textContent = "";
-  for (let model of appState.project.models) {
-    var modelElement = createElement(
-      "div",
-      ["selectable-item", "model"],
-      // document.createTextNode(model["name"])
-      document.createTextNode(model.name)
-    );
-    for (let variable of model.vars || []) {
-      modelElement.appendChild(
-        createElement(
-          "div",
-          ["model-member"],
-          document.createTextNode(`${variable.name}: ${variable.type}`)
-        )
-      );
-    }
 
-    itemContainer.appendChild(modelElement);
-  }
+  // for (let model of appState.project.models) {
+  //   var modelElement = createElement(
+  //     "div",
+  //     ["selectable-item", "model"],
+  //     // document.createTextNode(model["name"])
+  //     document.createTextNode(model.name)
+  //   );
+  //   for (let variable of model.vars || []) {
+  //     modelElement.appendChild(
+  //       createElement(
+  //         "div",
+  //         ["model-member"],
+  //         document.createTextNode(`${variable.name}: ${variable.type}`)
+  //       )
+  //     );
+  //   }
+
+  //   itemContainer.appendChild(modelElement);
+  // }
+  Sidebar.addModels(appState.project.models);
+  Sidebar.addRequests(appState.project.requests);
 }
-
-// function updateSidebar(editor) {
-//   let service = appState.services[appState.selectedTab];
-
-//   let code = editor.getValue();
-//   rpc_call(service.server, "parse", { code }, response => {
-//     refreshSidebar(response["models"]);
-//     // for (let model of response["models"]) {
-//     //   appendSidebarButton("sidebar", model["name"]);
-//     // }
-//   });
-// }
 
 // implement
 function rpc_call(
@@ -156,8 +152,6 @@ function setDefaultEditorState() {
       appState.selectedTab = "openapi";
       appState.services.openapi.code = response["code"];
       parseCode();
-
-      // updateState();
     }
   );
 }

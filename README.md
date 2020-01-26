@@ -1,9 +1,9 @@
 # CDD RPC Web Sandbox
 
-## Building
+## Development
 
 ```bash:
-npm run watch
+npm start
 ```
 
 ## Installation (Production)
