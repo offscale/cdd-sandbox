@@ -101,7 +101,7 @@ section {
 #sidebar .selectable-item.request {
   background-image: url("icon--class.svg");
 }
-#sidebar .model-member {
+#sidebar .selectable-item .member {
   font-weight: normal;
   font-size: 80%;
   color: #aaa;

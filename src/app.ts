@@ -18,12 +18,12 @@ var appState = {
       server: "ws://localhost:7777",
       syntax: "yaml",
       code: ""
-    },
-    typescript: {
-      server: "ws://localhost:7778",
-      syntax: "typescript",
-      code: ""
     }
+    // typescript: {
+    //   server: "ws://localhost:7778",
+    //   syntax: "typescript",
+    //   code: ""
+    // }
   }
 };
 
@@ -141,21 +141,24 @@ window.onload = () => {
 
   updateState();
 
-  document
-    .querySelector(".tab-bar--tab.openapi")
-    .addEventListener("click", event => {
-      saveState();
-      appState.selectedTab = "openapi";
-      updateState();
-    });
+  for (let service of Object.keys(appState.services)) {
+    // add tabs
+    document
+      .querySelector(".tab-bar")
+      .insertAdjacentHTML(
+        "beforeend",
+        `<div class='column tab-bar--tab ${service}'>${service}</div>`
+      );
 
-  document
-    .querySelector(".tab-bar--tab.typescript")
-    .addEventListener("click", event => {
-      saveState();
-      appState.selectedTab = "typescript";
-      updateState();
-    });
+    // add click even to tabs
+    document
+      .querySelector(`.tab-bar--tab.${service}`)
+      .addEventListener("click", event => {
+        saveState();
+        appState.selectedTab = service;
+        updateState();
+      });
+  }
 
   // listen for keyboard shortcuts
   document.addEventListener(

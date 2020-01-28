@@ -9,7 +9,7 @@ export module Sidebar {
     addRequests(state.project.requests);
   }
 
-  export function addRequests(requests) {
+  function addRequests(requests) {
     let requestsContainer = document.querySelector(requestsSelector);
     requestsContainer.textContent = "";
 
@@ -19,11 +19,12 @@ export module Sidebar {
         ["selectable-item", "request"],
         document.createTextNode(`${request.method} ${request.path}`)
       );
+      addVariables(request.vars, el);
       requestsContainer.appendChild(el);
     }
   }
 
-  export function addModels(models) {
+  function addModels(models) {
     let modelsContainer = document.querySelector(modelsSelector);
     modelsContainer.textContent = "";
 
@@ -34,17 +35,20 @@ export module Sidebar {
         // document.createTextNode(model["name"])
         document.createTextNode(model.name)
       );
-      for (let variable of model.vars || []) {
-        el.appendChild(
-          DOM.createElement(
-            "div",
-            ["model-member"],
-            document.createTextNode(`${variable.name}: ${variable.type}`)
-          )
-        );
-      }
-
+      addVariables(model.vars, el);
       modelsContainer.appendChild(el);
+    }
+  }
+
+  function addVariables(variables, element) {
+    for (let variable of variables || []) {
+      element.appendChild(
+        DOM.createElement(
+          "div",
+          ["member"],
+          document.createTextNode(`${variable.name}: ${variable.type}`)
+        )
+      );
     }
   }
 }
