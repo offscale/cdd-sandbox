@@ -7,7 +7,7 @@ require("brace/theme/monokai");
 import { Sidebar } from "./sidebar";
 
 var appState = {
-  selectedTab: null,
+  selectedTab: "openapi",
   editor: null,
   project: {
     models: [],
@@ -18,12 +18,12 @@ var appState = {
       server: "ws://localhost:7777",
       syntax: "yaml",
       code: ""
+    },
+    typescript: {
+      server: "ws://localhost:7778",
+      syntax: "typescript",
+      code: ""
     }
-    // typescript: {
-    //   server: "ws://localhost:7778",
-    //   syntax: "typescript",
-    //   code: ""
-    // }
   }
 };
 
@@ -97,7 +97,7 @@ function rpc_call(
   params: any,
   callback: (response: any) => void
 ) {
-  console.log([`rpc_call: ${host} -> ${method}`, params]);
+  console.log(`rpc_call: ${host} -> ${method}`, params);
 
   var client = JsonRpcWs.createClient();
   client.connect(host, function connected() {
@@ -131,16 +131,6 @@ function setDefaultEditorState() {
 window.onload = () => {
   console.log("window loaded");
 
-  // ace editor init
-  var editor = ace.edit("javascript-editor");
-  editor.$blockScrolling = Infinity;
-  editor.setTheme("ace/theme/monokai");
-  appState.editor = editor;
-  setDefaultEditorState();
-  // end editor init
-
-  updateState();
-
   for (let service of Object.keys(appState.services)) {
     // add tabs
     document
@@ -159,6 +149,16 @@ window.onload = () => {
         updateState();
       });
   }
+
+  // ace editor init
+  var editor = ace.edit("javascript-editor");
+  editor.$blockScrolling = Infinity;
+  editor.setTheme("ace/theme/monokai");
+  appState.editor = editor;
+  setDefaultEditorState();
+  // end editor init
+
+  updateState();
 
   // listen for keyboard shortcuts
   document.addEventListener(

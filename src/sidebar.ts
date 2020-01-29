@@ -19,7 +19,7 @@ export module Sidebar {
         ["selectable-item", "request"],
         document.createTextNode(`${request.method} ${request.path}`)
       );
-      addVariables(request.vars, el);
+      addVariables(request.params, el);
       requestsContainer.appendChild(el);
     }
   }
