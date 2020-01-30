@@ -187,7 +187,7 @@ window.onload = () => {
       }
 
       // keypress of ctrl+s
-      if (event.ctrlKey && keyName == "s") {
+      if (event.ctrlKey && (keyName == "s" || keyName == "S")) {
         saveState();
         parseCode();
         event.preventDefault();
