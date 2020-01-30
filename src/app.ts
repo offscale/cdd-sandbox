@@ -59,7 +59,7 @@ function parseCode() {
 }
 
 function updateState() {
-  console.log(["updating ui state", appState]);
+  console.log("ui: updating state", appState);
   updateTabs();
   updateEditor();
   Sidebar.update(appState);
@@ -91,42 +91,53 @@ function updateEditor() {
   }
 }
 
+function getServiceFromServer(server: String): string {
+  for (let service of Object.keys(appState.services)) {
+    if (appState.services[service].server == server) {
+      return service;
+    }
+  }
+
+  return "unknown server: ";
+}
+
 // implement
 function rpc_call(
-  host: String,
-  method: String,
+  host: string,
+  method: string,
   params: any,
   callback: (response: any) => void
 ) {
-  console.log(`rpc_call: ${host} -> ${method}`, params);
+  console.info(`rpc_call: ${getServiceFromServer(host)} -> ${method}`, params);
+
+  var client = JsonRpcWs.createClient();
 
   try {
-    var client = JsonRpcWs.createClient();
-  } catch {
-    console.log("error");
-  }
-
-  try {
-    client.connect(host, function connected() {
+    client.connect(host, () => {
       try {
-        client.send(method, params, function mirrorReply(
-          error: any,
-          response: { [x: string]: any }
-        ) {
-          if (error != null) {
-            console.log(`${method} error`, error);
-            ErrorBar.pushError(`Parse error: ${error.message} (${host})`);
-          } else {
-            console.log([`${method} response`, response]);
-            callback(response);
+        client.send(
+          method,
+          params,
+          async (error: any, response: { [x: string]: any }) => {
+            if (error != null) {
+              console.error(`${method} error`, error);
+              ErrorBar.pushError(`rpc error: ${error.message} (${host})`);
+            } else {
+              console.log(
+                `rpc_response: ${getServiceFromServer(host)} -> ${method}`,
+                response
+              );
+              callback(response);
+            }
           }
-        });
-      } catch {
-        ErrorBar.pushError(`Error connecting to rpc webservice at ${host}`);
+        );
+      } catch (Error) {
+        ErrorBar.pushError(`error: ${Error.message}`);
+        // console.error(Error);
       }
     });
-  } catch {
-    console.log("error conn");
+  } catch (Error) {
+    ErrorBar.pushError(`error: ${Error.message}`);
   }
 }
 
