@@ -5,6 +5,7 @@ require("brace/mode/yaml");
 require("brace/mode/typescript");
 require("brace/theme/monokai");
 import { Sidebar } from "./sidebar";
+import { ErrorBar } from "./error";
 
 var appState = {
   selectedTab: "openapi",
@@ -99,20 +100,34 @@ function rpc_call(
 ) {
   console.log(`rpc_call: ${host} -> ${method}`, params);
 
-  var client = JsonRpcWs.createClient();
-  client.connect(host, function connected() {
-    client.send(method, params, function mirrorReply(
-      error: any,
-      response: { [x: string]: any }
-    ) {
-      if (error != null) {
-        console.log([`${method} error`, error]);
-      } else {
-        console.log([`${method} response`, response]);
-        callback(response);
+  try {
+    var client = JsonRpcWs.createClient();
+  } catch {
+    console.log("error");
+  }
+
+  try {
+    client.connect(host, function connected() {
+      try {
+        client.send(method, params, function mirrorReply(
+          error: any,
+          response: { [x: string]: any }
+        ) {
+          if (error != null) {
+            console.log(`${method} error`, error);
+            ErrorBar.pushError(`Parse error: ${error.message} (${host})`);
+          } else {
+            console.log([`${method} response`, response]);
+            callback(response);
+          }
+        });
+      } catch {
+        ErrorBar.pushError(`Error connecting to rpc webservice at ${host}`);
       }
     });
-  });
+  } catch {
+    console.log("error conn");
+  }
 }
 
 function setDefaultEditorState() {

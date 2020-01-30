@@ -30,6 +30,15 @@ body {
   height: 100%;
 }
 
+/* errorbar */
+#errors .error {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
 /* flex */
 body {
   display: flex;
