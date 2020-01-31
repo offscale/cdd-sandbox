@@ -6,8 +6,9 @@ require("brace/mode/typescript");
 require("brace/theme/monokai");
 import { Sidebar } from "./sidebar";
 import { ErrorBar } from "./error";
+import { Models } from "./models";
 
-var appState = {
+var appState: Models.AppState = {
   selectedTab: "openapi",
   editor: null,
   project: {
@@ -45,6 +46,7 @@ function parseCode() {
   let params = { code: svc.code };
 
   rpc_call(svc.server, "parse", params, response => {
+    console.log("response", response);
     // note: this may do well with a check for the 'models' and 'requests' keys...
     appState.project = response;
     updateState();

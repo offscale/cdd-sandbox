@@ -1,12 +1,29 @@
 import { DOM } from "./dom";
+import { Models } from "./models";
 
 let modelsSelector = ".sidebar--items.models";
 let requestsSelector = ".sidebar--items.requests";
 
 export module Sidebar {
-  export function update(state) {
+  export function update(state: Models.AppState) {
     addModels(state.project.models);
     addRequests(state.project.requests);
+  }
+
+  function addModels(models: Models.Model[]) {
+    let modelsContainer = document.querySelector(modelsSelector);
+    modelsContainer.textContent = "";
+
+    for (let model of models) {
+      var el = DOM.createElement(
+        "div",
+        ["selectable-item", "model"],
+        // document.createTextNode(model["name"])
+        document.createTextNode(model.name)
+      );
+      addVariables(model.vars, el);
+      modelsContainer.appendChild(el);
+    }
   }
 
   function addRequests(requests) {
@@ -21,22 +38,6 @@ export module Sidebar {
       );
       addVariables(request.params, el);
       requestsContainer.appendChild(el);
-    }
-  }
-
-  function addModels(models) {
-    let modelsContainer = document.querySelector(modelsSelector);
-    modelsContainer.textContent = "";
-
-    for (let model of models) {
-      var el = DOM.createElement(
-        "div",
-        ["selectable-item", "model"],
-        // document.createTextNode(model["name"])
-        document.createTextNode(model.name)
-      );
-      addVariables(model.vars, el);
-      modelsContainer.appendChild(el);
     }
   }
 
