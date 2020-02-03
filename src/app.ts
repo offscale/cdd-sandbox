@@ -32,6 +32,21 @@ var appState: Models.AppState = {
       syntax: "rust",
       code: ""
     }
+    // kotlin: {
+    //   server: "ws://localhost:7780",
+    //   syntax: "kotlin",
+    //   code: ""
+    // }
+    // swift: {
+    //   server: "ws://localhost:7781",
+    //   syntax: "swift",
+    //   code: ""
+    // },
+    // java: {
+    //   server: "ws://localhost:7782",
+    //   syntax: "java",
+    //   code: ""
+    // },
   }
 };
 
