@@ -3,6 +3,7 @@ var ace = require("brace");
 require("brace/mode/javascript");
 require("brace/mode/yaml");
 require("brace/mode/typescript");
+require("brace/mode/rust");
 require("brace/theme/monokai");
 import { Sidebar } from "./sidebar";
 import { ErrorBar } from "./error";
@@ -21,9 +22,14 @@ var appState: Models.AppState = {
       syntax: "yaml",
       code: ""
     },
-    typescript: {
-      server: "ws://localhost:7778",
-      syntax: "typescript",
+    // typescript: {
+    //   server: "ws://localhost:7778",
+    //   syntax: "typescript",
+    //   code: ""
+    // },
+    rust: {
+      server: "ws://localhost:7779",
+      syntax: "rust",
       code: ""
     }
   }
@@ -48,7 +54,7 @@ function parseCode() {
   rpc_call(svc.server, "parse", params, response => {
     console.log("response", response);
     // note: this may do well with a check for the 'models' and 'requests' keys...
-    appState.project = response;
+    appState.project = response.project;
     updateState();
 
     // sync across other languages

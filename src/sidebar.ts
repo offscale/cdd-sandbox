@@ -14,6 +14,10 @@ export module Sidebar {
     let modelsContainer = document.querySelector(modelsSelector);
     modelsContainer.textContent = "";
 
+    if (models.length == 0) {
+      return;
+    }
+
     for (let model of models) {
       var el = DOM.createElement(
         "div",
@@ -29,6 +33,10 @@ export module Sidebar {
   function addRequests(requests) {
     let requestsContainer = document.querySelector(requestsSelector);
     requestsContainer.textContent = "";
+
+    if (requests.length == 0) {
+      return;
+    }
 
     for (let request of requests) {
       var el = DOM.createElement(
