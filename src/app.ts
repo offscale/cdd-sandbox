@@ -4,6 +4,7 @@ require("brace/mode/javascript");
 require("brace/mode/yaml");
 require("brace/mode/typescript");
 require("brace/mode/rust");
+require("brace/mode/swift");
 require("brace/theme/monokai");
 import { Sidebar } from "./sidebar";
 import { ErrorBar } from "./error";
@@ -22,11 +23,11 @@ var appState: Models.AppState = {
       syntax: "yaml",
       code: ""
     },
-    // typescript: {
-    //   server: "ws://localhost:7778",
-    //   syntax: "typescript",
-    //   code: ""
-    // },
+    typescript: {
+      server: "ws://localhost:7778",
+      syntax: "typescript",
+      code: ""
+    },
     rust: {
       server: "ws://localhost:7779",
       syntax: "rust",
@@ -41,7 +42,7 @@ var appState: Models.AppState = {
     //   server: "ws://localhost:7781",
     //   syntax: "swift",
     //   code: ""
-    // },
+    // }
     // java: {
     //   server: "ws://localhost:7782",
     //   syntax: "java",
@@ -155,12 +156,16 @@ function rpc_call(
           }
         );
       } catch (Error) {
-        ErrorBar.pushError(`error: ${Error.message}`);
+        ErrorBar.pushError(
+          `RPC Client Error: ${getServiceFromServer(host)}: ${Error.message}`
+        );
         // console.error(Error);
       }
     });
   } catch (Error) {
-    ErrorBar.pushError(`error: ${Error.message}`);
+    ErrorBar.pushError(
+      `RPC Connection Error: ${getServiceFromServer(host)}: ${Error.message}`
+    );
   }
 }
 

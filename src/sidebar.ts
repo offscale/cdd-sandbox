@@ -42,7 +42,9 @@ export module Sidebar {
       var el = DOM.createElement(
         "div",
         ["selectable-item", "request"],
-        document.createTextNode(`${request.method} ${request.path}`)
+        document.createTextNode(
+          `${request.name}: ${request.method} ${request.path}`
+        )
       );
       addVariables(request.params, el);
       requestsContainer.appendChild(el);
