@@ -1,6 +1,7 @@
 import { RPC } from "./rpc";
 import { Models } from "./models";
 import { State } from "./state";
+import { ErrorBar } from "./error";
 
 export module Methods {
   export function parse(service: string, appState: Models.AppState) {
@@ -8,9 +9,14 @@ export module Methods {
     let params = { code: svc.code };
 
     RPC.call(service, svc.server, "parse", params, response => {
-      console.log("response", response);
+      // console.log("response", response);
       // note: this may do well with a check for the 'models' and 'requests' keys...
-      appState.project = response.project;
+      if (response.project) {
+        appState.project = response.project;
+      } else {
+        ErrorBar.pushError(`null project from ${service}`);
+      }
+
       State.update(appState);
 
       // sync across other languages

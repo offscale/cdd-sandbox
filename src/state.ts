@@ -13,30 +13,30 @@ export module State {
       },
       services: {
         openapi: {
-          server: "ws://localhost:7777",
+          server: "ws://192.168.1.230:7777",
           syntax: "yaml",
           code: ""
         },
         typescript: {
-          server: "ws://localhost:7778",
+          server: "ws://192.168.1.230:7778",
           syntax: "typescript",
           code: ""
         },
         rust: {
-          server: "ws://localhost:7779",
+          server: "ws://192.168.1.230:7779",
           syntax: "rust",
           code: ""
-        }
+        },
         // kotlin: {
         //   server: "ws://localhost:7780",
         //   syntax: "kotlin",
         //   code: ""
         // }
-        // swift: {
-        //   server: "ws://localhost:7781",
-        //   syntax: "swift",
-        //   code: ""
-        // }
+        swift: {
+          server: "ws://192.168.1.230:7781",
+          syntax: "swift",
+          code: ""
+        }
         // java: {
         //   server: "ws://localhost:7782",
         //   syntax: "java",

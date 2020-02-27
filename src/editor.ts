@@ -1,3 +1,5 @@
+import { Models } from "./models";
+
 var ace = require("brace");
 require("brace/mode/javascript");
 require("brace/mode/yaml");
