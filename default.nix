@@ -6,7 +6,5 @@ pkgs.mkShell {
     nodejs
   ];
 
-  shellHook = ''
-    CC=clang
-  '';
+  shellHook = "";
 }

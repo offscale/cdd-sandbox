@@ -21,7 +21,7 @@ export module RPC {
             params,
             async (error: any, response: { [x: string]: any }) => {
               if (error != null) {
-                console.error(`${method} error`, error);
+                console.error(`${servername} ${method} error`, error.message);
                 ErrorBar.pushError(`rpc error: ${error.message} (${host})`);
               } else {
                 console.log(

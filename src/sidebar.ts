@@ -47,6 +47,7 @@ export module Sidebar {
         )
       );
       addVariables(request.params, el);
+      addVariables(request.response_type, el);
       requestsContainer.appendChild(el);
     }
   }
