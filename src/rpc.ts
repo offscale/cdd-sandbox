@@ -21,11 +21,11 @@ export module RPC {
             params,
             async (error: any, response: { [x: string]: any }) => {
               if (error != null) {
-                console.error(`${servername} ${method} error`, error.message);
-                ErrorBar.pushError(`rpc error: ${error.message} (${host})`);
+                console.error(`rpc-error-response: ${servername}/${method}: `, error.message);
+                ErrorBar.pushError(`rpc-error-response: ${servername}/${method}: ${error.message}`);
               } else {
                 console.log(
-                  `rpc_response: ${servername} -> ${method}`,
+                  `rpc-response: ${servername} -> ${method}`,
                   response
                 );
                 callback(response);

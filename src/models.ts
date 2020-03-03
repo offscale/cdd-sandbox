@@ -24,7 +24,7 @@ export module Models {
   }
 
   export class Variable {
-    name: string;
+    name?: string;
     type: string;
     optional: boolean;
     value?: string;

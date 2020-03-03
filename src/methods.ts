@@ -11,7 +11,7 @@ export module Methods {
     RPC.call(service, svc.server, "parse", params, response => {
       // console.log("response", response);
       // note: this may do well with a check for the 'models' and 'requests' keys...
-      if (response.project) {
+      if (response.project as Models.Project) {
         appState.project = response.project;
       } else {
         ErrorBar.pushError(`null project from ${service}`);

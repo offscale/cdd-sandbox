@@ -47,7 +47,17 @@ export module Sidebar {
         )
       );
       addVariables(request.params, el);
-      addVariables(request.response_type, el);
+      // addVariables(request.response_type, el);
+      if (request.response_type) {
+        el.appendChild(
+          DOM.createElement(
+            "div",
+            ["return"],
+            document.createTextNode(`-> ${request.response_type.Complex}`)
+          )
+        );
+      }
+
       requestsContainer.appendChild(el);
     }
   }
