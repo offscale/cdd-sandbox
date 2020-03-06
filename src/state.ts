@@ -1,17 +1,45 @@
-var JsonRpcWs = require("json-rpc-ws/browser");
 import { Models } from "./models";
 import { Sidebar } from "./sidebar";
+import { Tabs } from "./tabs"; // extract later
+import { Editor } from "./editor";
+import { Processors } from "./processors";
+import { Methods } from "./methods";
 
 export module State {
-  export function reset(): Models.AppState {
-    return {
-      selectedTab: "openapi",
-      editor: null,
-      project: {
+
+  export class AppState {
+    selectedTab: string;
+    editor: any;
+    project: Models.Project;
+    services: any;
+    projects: any;
+
+    constructor(editor: any) {
+      this.selectedTab = "rust-server";
+      this.editor = editor;
+      this.project = {
         models: [],
         requests: []
-      },
-      services: {
+      };
+      this.projects = [
+        {
+          name: "rust-server",
+          description: "Rust Server",
+          processor: Processors.processors["rust-server"],
+          syntax: "rust",
+          ast: {},
+          code: "rust code", // mostly a cache for tab switching
+        },
+        {
+          name: "openapi",
+          description: "OpenAPI v3",
+          processor: Processors.processors["openapi"],
+          syntax: "yaml",
+          ast: {},
+          code: "openapi code", // mostly a cache for tab switching
+        }
+      ];
+      this.services = { // delete this stuff
         openapi: {
           server: "ws://localhost:7777",
           syntax: "yaml",
@@ -27,55 +55,67 @@ export module State {
           syntax: "rust",
           code: ""
         }
-        // kotlin: {
-        //   server: "ws://localhost:7780",
-        //   syntax: "kotlin",
-        //   code: ""
-        // }
-        // swift: {
-        //   server: "ws://localhost:7781",
-        //   syntax: "swift",
-        //   code: ""
-        // }
-        // java: {
-        //   server: "ws://localhost:7782",
-        //   syntax: "java",
-        //   code: ""
-        // },
+      };
+    }
+
+    currentProject() {
+      let currentProject = this.projects.find((project) => project.name === this.selectedTab);
+      if (!currentProject) {
+        console.log("no current project selected", this);
       }
-    };
-  }
+      return currentProject;
+    }
 
-  export function update(appState: Models.AppState) {
-    console.log("state.update", appState);
-    updateTabs(appState);
-    updateEditor(appState);
-    Sidebar.update(appState);
-  }
+    clickTab(tabId: string) {
+      this.selectedTab = tabId;
+    }
 
-  export function save(appState: Models.AppState) {
-    if (appState.selectedTab) {
-      appState.services[appState.selectedTab].code = appState.editor.getValue();
+    save() {
+      let currentProject = this.currentProject();
+
+      currentProject.code = this.editor.getValue();
+      // update sidebar
+      this.project = currentProject.processor.getProject(currentProject.code);
+
+      // currentProject.ast = currentProject.processor.getAST(currentProject.code);
     }
   }
+
+  // export function update() {
+  //   console.log("state.update", appState);
+  //   Tabs.update(appState);
+  //   Editor.update(appState);
+  //   Sidebar.update(appState);
+  // }
+
+  // export function save() {
+  //   // if a tab is active and selected,
+  //   if (appState.selectedTab) {
+  //     // grab the editors code and save it
+  //     // appState.services[appState.selectedTab].code = appState.editor.getValue();
+  //     // parse and save the ast structure
+  //     // appState.projects[appState.selectedTab].code = appState.editor.getValue();
+  //     currentProject().code = appState.editor.getValue();
+  //   }
+  // }
 }
 
-function updateTabs(appState: Models.AppState) {
-  document.querySelectorAll(`.tab-bar--tab.active`).forEach(value => {
-    value.classList.remove("active");
-  });
-  if (appState.selectedTab) {
-    document
-      .querySelector(`.tab-bar--tab.${appState.selectedTab}`)
-      .classList.add("active");
-  }
-}
+// function updateTabs(appState: Models.AppState) {
+//   document.querySelectorAll(`.tab-bar--tab.active`).forEach(value => {
+//     value.classList.remove("active");
+//   });
+//   if (appState.selectedTab) {
+//     document
+//       .querySelector(`.tab-bar--tab.${appState.selectedTab}`)
+//       .classList.add("active");
+//   }
+// }
 
-function updateEditor(appState: Models.AppState) {
-  if (appState.selectedTab) {
-    let service = appState.services[appState.selectedTab];
-    appState.editor.getSession().setMode(`ace/mode/${service.syntax}`);
-    appState.editor.setValue(service.code);
-    appState.editor.clearSelection();
-  }
-}
+// function updateEditor(appState: Models.AppState) {
+//   if (appState.selectedTab) {
+//     let service = appState.services[appState.selectedTab];
+//     appState.editor.getSession().setMode(`ace/mode/${service.syntax}`);
+//     appState.editor.setValue(service.code);
+//     appState.editor.clearSelection();
+//   }
+// }

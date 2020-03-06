@@ -1,12 +1,5 @@
 export module Models {
 
-  export class AppState {
-    selectedTab: string;
-    editor: any;
-    project: Project;
-    services: any;
-  }
-
   export class Service {
     server: string;
     syntax: string;
@@ -38,5 +31,4 @@ export module Models {
     return_type: string;
     response_type: string;
   }
-  
 }

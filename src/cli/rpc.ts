@@ -1,5 +1,4 @@
 var JsonRpcWs = require("json-rpc-ws/browser");
-import { ErrorBar } from "./error";
 
 export module RPC {
   export function call(
@@ -9,7 +8,7 @@ export module RPC {
     params: any,
     callback: (response: any) => void
   ) {
-    console.info(`rpc_call: ${servername} ${host} -> ${method}`, params);
+    console.info(`rpc_call: ${servername} -> ${method}`, params);
 
     var client = JsonRpcWs.createClient();
 
@@ -22,7 +21,6 @@ export module RPC {
             async (error: any, response: { [x: string]: any }) => {
               if (error != null) {
                 console.error(`rpc-error-response: ${servername}/${method}: `, error.message);
-                ErrorBar.pushError(`rpc-error-response: ${servername}/${method}: ${error.message}`);
               } else {
                 console.log(
                   `rpc-response: ${servername} -> ${method}`,
@@ -33,16 +31,16 @@ export module RPC {
             }
           );
         } catch (Error) {
-          ErrorBar.pushError(
-            `RPC Client Error: ${servername}: ${Error.message}`
-          );
+        //   ErrorBar.pushError(
+        //     `RPC Client Error: ${servername}: ${Error.message}`
+        //   );
           // console.error(Error);
         }
       });
     } catch (Error) {
-      ErrorBar.pushError(
-        `RPC Connection Error: ${servername}: ${Error.message}`
-      );
+    //   ErrorBar.pushError(
+    //     `RPC Connection Error: ${servername}: ${Error.message}`
+    //   );
     }
   }
 }
