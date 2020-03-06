@@ -1,9 +1,5 @@
 import { Models } from "./models";
-import { Sidebar } from "./sidebar";
-import { Tabs } from "./tabs"; // extract later
-import { Editor } from "./editor";
 import { Processors } from "./processors";
-import { Methods } from "./methods";
 import { UI } from "./ui";
 
 export module State {
@@ -76,7 +72,10 @@ export module State {
 
       currentProject.code = this.editor.getValue();
       // update sidebar
-      this.project = currentProject.processor.getProject(currentProject.code);
+      currentProject.processor.getProject(currentProject.code).then((project) => {
+        this.project = project;
+        UI.update(this);
+      });
 
       // currentProject.ast = currentProject.processor.getAST(currentProject.code);
     }

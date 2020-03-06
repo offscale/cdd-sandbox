@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "brace": "^0.11.1",
-    "json-rpc-ws": "^7.0.1"
+    "json-rpc-ws": "^7.0.1",
+    "jsonpath-plus": "^3.0.0",
+    "rpc-websocket-client": "^1.1.4"
   },
   "scripts": {
     "build": "webpack",

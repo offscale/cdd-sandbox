@@ -28,27 +28,25 @@ export module Methods {
     });
   }
 
-  export function serialise(server: string, code: string): any {
-    let params = { code: code };
+  export async function serialise(server: string, code: string) {
+    return await RPC.ccall(server, "serialise", { code: code });
 
-    RPC.call("none", server, "serialise", params, response => {
+    //   if(response.ast) {
+    //     // extract a project from the ast
+    //     callback(response.ast);
+    //   } else {
+    //     ErrorBar.pushError(`invalid response from ${server}`);
+    //   }
 
-      if(response.ast) {
-        // extract a project from the ast
-        return response.ast;
-      } else {
-        ErrorBar.pushError(`invalid response from ${server}`);
-      }
+    //   // State.update(appState);
 
-      // State.update(appState);
-
-      // sync across other languages
-      // for (let service of Object.keys(appState.services)) {
-      //   if (appState.selectedTab != service) {
-      //     Methods.update(service, appState);
-      //   }
-      // }
-    });
+    //   // sync across other languages
+    //   // for (let service of Object.keys(appState.services)) {
+    //   //   if (appState.selectedTab != service) {
+    //   //     Methods.update(service, appState);
+    //   //   }
+    //   // }
+    // });
   }
 
   export function update(service: Models.Service, appState: State.AppState) {
