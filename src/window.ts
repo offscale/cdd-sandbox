@@ -3,6 +3,7 @@ import { Editor } from "./editor";
 import { Methods } from "./methods";
 import { Tabs } from "./tabs";
 import { Processors } from "./processors";
+import { UI } from "./ui";
 
 export module Window {
   export function onLoad(ev: Event) {
@@ -31,6 +32,8 @@ export module Window {
           // let selectedService = appState.services[appState.selectedTab];
           let currentProject = appState.currentProject();
           appState.save();
+
+          UI.update(appState);
 
           // let ast = Methods.serialise(currentProject.processor.server, currentProject.code);
           // currentProject.ast = ast;

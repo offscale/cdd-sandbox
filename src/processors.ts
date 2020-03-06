@@ -1,4 +1,5 @@
 import { Methods } from "./methods";
+import { Models } from "./models";
 
 export module Processors {
     export let services = {
@@ -9,14 +10,20 @@ export module Processors {
         "rust-server": {
             server: services.rust,
             syntax: "rust",
-            getProject(code: string) { return Methods.serialise(this.server, code) },
-            getAST() { console.log("ast got:", this.ast); return {}; }
+            getProject(code: string): Models.Project {
+                let ast = Methods.serialise(this.server, code);
+                return {
+                    models: [
+                        { name: "Pet", vars: [] }
+                    ],
+                    requests: [],
+                };
+            }
         },
         "openapi": {
             server: services.openapi,
             syntax: "yaml",
-            getProject() { console.log("getProject called"); },
-            getAST() { console.log("ast got:", this.ast);}
+            getProject(code: string) { return Methods.serialise(this.server, code) }
         },
     };
 }

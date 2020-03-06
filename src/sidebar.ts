@@ -1,11 +1,12 @@
 import { DOM } from "./dom";
 import { Models } from "./models";
+import { State } from "./state";
 
 let modelsSelector = ".sidebar--items.models";
 let requestsSelector = ".sidebar--items.requests";
 
 export module Sidebar {
-  export function update(state: Models.AppState) {
+  export function update(state: State.AppState) {
     addModels(state.project.models);
     addRequests(state.project.requests);
   }

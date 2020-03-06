@@ -4,6 +4,7 @@ import { Tabs } from "./tabs"; // extract later
 import { Editor } from "./editor";
 import { Processors } from "./processors";
 import { Methods } from "./methods";
+import { UI } from "./ui";
 
 export module State {
 
@@ -28,7 +29,7 @@ export module State {
           processor: Processors.processors["rust-server"],
           syntax: "rust",
           ast: {},
-          code: "rust code", // mostly a cache for tab switching
+          code: "use diesel::Queryable;\n\n#[derive(Queryable, Debug)]\npub struct Pet {\n\tpub id: i32,\n\tpub name: String,\n\tpub tag: String,\n}\n\n#[derive(Queryable, Debug)]\npub struct Error {\n\tpub code: i32,\n\tpub message: String,\n}\n\npub fn listPets(limit: String) -> ApiResult<Error> {\n    ApiBase::call(\"GET\", \"/pets\", vec![(\"limit\", limit)])\n}\n\n\npub fn createPets() -> ApiResult<Error> {\n    ApiBase::call(\"POST\", \"/pets\", vec![])\n}\n\n\npub fn showPetById(petId: String) -> ApiResult<Error> {\n    ApiBase::call(\"GET\", \"/pets/{petId}\", vec![(\"petId\", petId)])\n}\n" // mostly a cache for tab switching
         },
         {
           name: "openapi",
