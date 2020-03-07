@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "brace": "^0.11.1",
+    "jq-in-the-browser": "^0.7.2",
     "json-rpc-ws": "^7.0.1",
     "jsonpath-plus": "^3.0.0",
     "rpc-websocket-client": "^1.1.4"

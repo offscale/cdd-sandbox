@@ -37,6 +37,7 @@ export module RPC {
   }
 }
 
+// unneeded; remove
 export module RPC {
   export async function call(
     servername: string,
@@ -72,7 +73,6 @@ export module RPC {
           ErrorBar.pushError(
             `RPC Client Error: ${servername}: ${Error.message}`
           );
-          // console.error(Error);
         }
       });
     } catch (Error) {

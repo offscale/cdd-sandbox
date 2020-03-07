@@ -5,6 +5,7 @@ import { ErrorBar } from "./error";
 
 export module Methods {
 
+  // remove
   export function parse(service: Models.Service, appState: State.AppState) {
     let params = { code: service.code };
 
@@ -17,8 +18,6 @@ export module Methods {
         ErrorBar.pushError(`null project from ${service}`);
       }
 
-      // State.update();
-
       // sync across other languages
       for (let serviceName of Object.keys(appState.services)) {
         if (appState.selectedTab != serviceName) {
@@ -30,31 +29,18 @@ export module Methods {
 
   export async function serialise(server: string, code: string) {
     return await RPC.ccall(server, "serialise", { code: code });
-
-    //   if(response.ast) {
-    //     // extract a project from the ast
-    //     callback(response.ast);
-    //   } else {
-    //     ErrorBar.pushError(`invalid response from ${server}`);
-    //   }
-
-    //   // State.update(appState);
-
-    //   // sync across other languages
-    //   // for (let service of Object.keys(appState.services)) {
-    //   //   if (appState.selectedTab != service) {
-    //   //     Methods.update(service, appState);
-    //   //   }
-    //   // }
-    // });
   }
 
+  export async function deserialise(server: string, ast: any) {
+    return await RPC.ccall(server, "deserialise", { ast: ast });
+  }
+
+  // remove
   export function update(service: Models.Service, appState: State.AppState) {
     let params = { project: appState.project, code: service.code };
 
     RPC.call("service", service.server, "update", params, response => {
       service.code = response["code"];
-      // State.update();
     });
   }
 
