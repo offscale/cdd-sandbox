@@ -11,6 +11,7 @@ export module Window {
     let appState = new State.AppState(Editor.init());
     // appState.editor = Editor.init();
     Tabs.init(appState); // this will be dynamic eventually
+    UI.update(appState);
     // State.update();
     
     // Methods.getTemplate("petstore", appState);

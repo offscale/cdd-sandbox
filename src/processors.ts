@@ -1,7 +1,7 @@
 import { Methods } from "./methods";
 import { Models } from "./models";
 const { JSONPath } = require('jsonpath-plus');
-const jq = require("jq-in-the-browser").default;
+const nodejq = require("jq-in-the-browser").default;
 
 // tip: use https://jsonpath.com/ and https://duckduckgo.com/?q=json+format https://github.com/s3u/JSONPath
 // json templating: https://www.npmjs.com/package/jsonpath-object-transform
@@ -39,19 +39,53 @@ export module Processors {
             syntax: "yaml",
             async getProject(code: string): Promise<Models.Project> {
                 return await Methods.serialise(this.server, code).then((response) => {
-                    const components = JSONPath({path: '$..components.schemas', json: response, wrap: false});
-                    const result = jq('.[] | to_entries[] |{"name":.key, "vars":.value}')(components);
-                    let models = result.map((model) => {
-                        console.log("mm", model);
-                        return model;
+
+                    // const components = select(response, '$..components.schemas');
+                    // const models = transform(components, '.[]|to_entries[]|{"name":.key, "vars": .value.properties | to_entries[] |{"name": .key, "type": .value.type }}');
+
+                    select(response, '$..components.schemas').map((component) => {
+                        console.log(component);
+                        console.log(select(component, '$.properties'));
+                        return {};
+                        
+                        // select(component, '$...properties')).map((property) => {
+                        //     console.log(component);
+                        //     return {};
+                        // });
+                        // return {name: "", vars: []};
                     });
 
+
+                    var models = [];
+                    for (const components of select(response, '$..components.schemas')) {
+                        for (const modelName in components) {
+                            const properties = components[modelName].properties;
+                            var variables = [];
+
+                            for (const variableName in properties) {
+                                const variable = properties[variableName];
+
+                                variables.push({name: variableName, type: variable.type});
+                            };
+
+                            models.push({name: modelName, vars: variables});
+                        }
+                    }
+
                     return {
-                        models: result,
+                        models: models,
                         requests: [],
                     };
                 });
             }
         },
     };
+}
+
+function transform(json:any, transform: string) {
+    return nodejq(transform)(json);
+}
+
+function select(json: any, path: string) {
+    return JSONPath({path: '$..components.schemas', json: json, wrap: false});
 }
