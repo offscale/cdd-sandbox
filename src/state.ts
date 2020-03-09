@@ -1,6 +1,8 @@
 import { Models } from "./models";
 import { Processors } from "./processors";
 import { UI } from "./ui";
+import { Methods } from "./methods";
+import { OpenAPIProcessor } from "./processors/openapi";
 
 export module State {
 
@@ -8,12 +10,14 @@ export module State {
     selectedTab: string;
     editor: any;
     project: Models.Project;
+    spec: {};
     services: any;
     projects: any;
 
     constructor(editor: any) {
       this.selectedTab = "openapi";
       this.editor = editor;
+      this.spec = {"components":{"schemas":{"Error":{"properties":{"code":{"format":"int32","type":"integer"},"message":{"type":"string"}},"required":["code","message"],"type":"object"},"Pet":{"properties":{"id":{"format":"int64","type":"integer"},"name":{"type":"string"},"tag":{"type":"string"}},"required":["id","name"],"type":"object"},"Pets":{"items":{"$ref":"#/components/schemas/Pet"},"type":"array"}}},"info":{"license":{"name":"MIT"},"title":"Swagger Petstore","version":"1.0.0"},"openapi":"3.0.0","paths":{"/pets":{"get":{"operationId":"listPets","parameters":[{"description":"How many items to return at one time (max 100)","in":"query","name":"limit","schema":{"format":"int32","type":"integer"},"style":"form"}],"responses":{"200":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pets"}}},"description":"A paged array of pets","headers":{"x-next":{"description":"A link to the next page of responses","schema":{"type":"string"},"style":"simple"}}},"default":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}},"description":"unexpected error"}},"summary":"List all pets","tags":["pets"]},"post":{"operationId":"createPets","responses":{"201":{"description":"Null response"},"default":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}},"description":"unexpected error"}},"summary":"Create a pet","tags":["pets"]}},"/pets/{petId}":{"get":{"operationId":"showPetById","parameters":[{"description":"The id of the pet to retrieve","in":"path","name":"petId","required":true,"schema":{"type":"string"},"style":"simple"}],"responses":{"200":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pet"}}},"description":"Expected response to a valid request"},"default":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}},"description":"unexpected error"}},"summary":"Info for a specific pet","tags":["pets"]}}},"servers":[{"url":"http://petstore.swagger.io/v1"}]};
       this.project = {
         models: [],
         requests: []
@@ -67,16 +71,52 @@ export module State {
       this.selectedTab = tabId;
     }
 
-    save() {
+    save() { // sync
       let currentProject = this.currentProject();
 
+      // save the current tab's code (THIS SHOULD HAPPEN ONLY ON VALID CODE)
       currentProject.code = this.editor.getValue();
-      // update sidebar
-      currentProject.processor.getProject(currentProject.code).then((project) => {
-        this.project = project;
-        UI.update(this);
+
+      // try to convert to ast via service adaptor
+      Methods.serialise(currentProject.processor.server, currentProject.code).then((result) => {
+        const ast = result["ast"];
+        console.log(result);
+        // memoize ast
+        currentProject.ast = ast;
+
+        // get spec update
+        const specUpdate = currentProject.processor.extractSpec(ast);
+
+        // merge spec with primary spec
+        this.spec = OpenAPIProcessor.merge(this.spec, specUpdate);
+
+        for (var project of this.projects) {
+          // send spec to every project, to update each ast
+          // deserialise each ast to code
+        }
       });
 
+      // // modify main openapi spec to reflect changes
+
+      // // update the sidebar (this is incorrect, directly call Sidebar.update(spec))
+      // currentProject.processor.getProject(currentProject.code).then((project) => {
+      //   this.project = project;
+
+      //   Processors.sync();
+      //   UI.update(this);
+      // });
+
+      // // 
+      // for (var project of this.projects) {
+      //   console.log("gggg", this);
+        
+
+      //   // send spec to every project, to update their ast
+      //   // deserialise each ast to code
+      //   project.processor.generate(this.spec).then((code) => {
+      //     project.code = code;
+      //   });
+      // }
     }
   }
 }

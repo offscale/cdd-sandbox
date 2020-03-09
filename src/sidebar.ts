@@ -1,14 +1,41 @@
 import { DOM } from "./dom";
 import { Models } from "./models";
 import { State } from "./state";
+import { OpenAPIProcessor } from "./processors/openapi";
 
 let modelsSelector = ".sidebar--items.models";
 let requestsSelector = ".sidebar--items.requests";
 
 export module Sidebar {
-  export function update(state: State.AppState) {
-    addModels(state.project.models);
-    addRequests(state.project.requests);
+
+  export function update(spec: {}) {
+    console.log('updating sidebar', spec);
+
+    reset();
+
+    OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
+      addModel(componentName);
+    });
+    // addModels(state.project.models);
+    // addRequests(state.project.requests);
+  }
+
+  function reset() {
+    const modelsContainer = document.querySelector(modelsSelector);
+    modelsContainer.textContent = "";
+  }
+
+  function addModel(modelName: string) {
+    const modelsContainer = document.querySelector(modelsSelector);
+
+    var el = DOM.createElement(
+      "div",
+      ["selectable-item", "model"],
+      // document.createTextNode(model["name"])
+      document.createTextNode(modelName)
+    );
+    // addVariables(model.vars, el);
+    modelsContainer.appendChild(el);
   }
 
   function addModels(models: Models.Model[]) {

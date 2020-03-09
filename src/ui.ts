@@ -8,6 +8,12 @@ export module UI {
         console.log("UI.update", appState);
         Tabs.update(appState);
         Editor.update(appState);
-        Sidebar.update(appState);
+
+        // temp, for testing, eventually don't need to parse this.
+
+        let currentProject = appState.currentProject();
+        let spec = currentProject.processor.extractSpec(currentProject.ast);
+
+        Sidebar.update(spec);
     }
 }
