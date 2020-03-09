@@ -9,14 +9,11 @@ export module Window {
   export function onLoad(ev: Event) {
     console.log("window loaded");
     let appState = new State.AppState(Editor.init());
-    // appState.editor = Editor.init();
-    Tabs.init(appState); // this will be dynamic eventually
+    Tabs.init(appState); // draw tabs based on config
+    // appState.save();
     UI.update(appState);
-    // State.update();
+    appState.save();
     
-    // Methods.getTemplate("petstore", appState);
-    // NEED THIS
-
     // listen for keyboard shortcuts
     document.addEventListener(
       "keydown",

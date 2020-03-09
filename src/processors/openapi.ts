@@ -66,5 +66,5 @@ function transform(json:any, transform: string) {
 }
 
 function select(json: any, path: string) {
-    return JSONPath({path: '$..components.schemas', json: json, wrap: false});
+    return JSONPath({path: path, json: json, wrap: false});
 }

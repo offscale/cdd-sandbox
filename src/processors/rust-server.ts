@@ -2,6 +2,7 @@ import { Models } from "../models";
 import { Methods } from "../methods";
 import { State } from "../state";
 import { OpenAPIProcessor } from "./openapi";
+import { Util } from "../utils";
 
 const { JSONPath } = require('jsonpath-plus');
 const nodejq = require("jq-in-the-browser").default;
@@ -12,26 +13,26 @@ export module RustServerProcessor {
     // }
 
     export function extractSpec(ast: {}): {} {
-        console.log("RustServerProcessor.extractSpec()");
-        return { components: { schemas: {"Pet": {}}}};
+        if (!ast) {
+            console.log("RustServerProcessor.extractSpec(): null ast");
+            return {};
+        }
+
+        const structs = select(ast, '$..struct');
+        console.log("RustServerProcessor.extractSpec()", ast, structs);
+        if (!Util.isIterable(structs)) {
+            return {};
+        }
+
+        let components = {};
+
+        for (const struct of structs) {
+            components[struct["ident"]] = {};
+        }
+
+        console.log("RustServerProcessor.extractSpec() -> ", components);
+        return { components: { schemas: components }};
     }
-
-    // // parses current code into openapi
-    // export async function parse(code: string): Promise<any> {
-    //     console.log("RustServerProcessor.parse()");
-
-    //     // const functions = JSONPath({path: '$..fn.ident', json: response});
-    //     const structs = JSONPath({path: '$..struct.ident', json: response});
-    //     let models = structs.map((struct) => {
-    //         return { name: struct, vars: [] };
-    //     });
-
-    //     return {
-    //         models: models,
-    //         requests: [],
-    //     };
-    //     return {};
-    // }
 
     // reads a openapi spec, returns rust ast 
     export async function generate(spec: {}): Promise<{}> {
@@ -58,6 +59,8 @@ function transform(json:any, transform: string): {} {
     return nodejq(transform)(json);
 }
 
-function select(json: any, path: string): {} {
-    return JSONPath({path: '$..components.schemas', json: json, wrap: false});
+function select(json: any, path: string) {
+    const selector = JSONPath({path: path, json: json, wrap: false});
+    console.log('select():', selector);
+    return selector;
 }
