@@ -61,6 +61,7 @@ export module State {
 
     currentProject() {
       let currentProject = this.projects.find((project) => project.name === this.selectedTab);
+      console.log("currentProject: ", currentProject);
       if (!currentProject) {
         console.log("no current project selected", this);
       }
@@ -74,12 +75,14 @@ export module State {
     save() { // sync
       console.log("State.save", this);
       let currentProject = this.currentProject();
+      // console.log("currentProject:", currentProject);
 
       // save the current tab's code (THIS SHOULD HAPPEN ONLY ON VALID CODE)
       currentProject.code = this.editor.getValue();
 
       // try to convert to ast via service adaptor
       Methods.serialise(currentProject.processor.server, currentProject.code).then((result) => {
+        let currentProject = this.currentProject();
         console.log("State.save->Methods.serialise", this, result);
         
         const ast = result["ast"];
@@ -92,15 +95,20 @@ export module State {
         // merge spec with primary spec
         // this.spec = OpenAPIProcessor.merge(this.spec, specUpdate);
 
-        for (var project of this.projects) {
-          if (project.name != this.selectedTab) {
-            console.log("State.save->Methods.serialise->project", project);
+        for (var backgroundProject of this.projects) {
+          if (backgroundProject.name != this.currentProject().name) {
+            console.log("State.save->Methods.serialise->backgroundProject", backgroundProject.name, this, backgroundProject);
+
+            // this is like hoisting but threaded, typescript is a broken piece of shit.
+            let arrrrr = backgroundProject;
+
             // send spec to every project, to update each ast
-            project.processor.update(project.processor.server, this.spec);
+            // project.processor.update(project.processor.server, this.spec);
 
             // deserialise each ast to code
-            Methods.deserialise(project.processor.server, project.ast).then((result) => {
-              project.code = result["output"];
+            Methods.deserialise(backgroundProject.processor.server, backgroundProject.ast).then((result) => {
+              console.log("State.save->Methods.serialise->Methods.deserialise = ", arrrrr, backgroundProject, result, this);
+              arrrrr.code = result["output"];
             });
           }
         }
