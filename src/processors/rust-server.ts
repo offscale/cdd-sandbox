@@ -33,9 +33,23 @@ export module RustServerProcessor {
         return { components: { schemas: components }};
     }
 
-    export async function update(server: string, spec: {}) {
-        let ast = await generate(spec);
-        return Methods.deserialise(server, ast);
+    // takes an openapi spec, updates ast
+    export function merge(currentast: {}, spec: {}) {
+        console.log("RustServerProcessor.generate()");
+
+        let ast = { items: [] };
+
+        // add models to the ast
+        OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
+            // console.log(componentName, component);
+            let properties = OpenAPIProcessor.selectComponentProperties(component).map((property) => {
+                return createClassField(property["name"], property["type"]);
+            });
+            
+            ast.items.push(createClass(componentName, properties));
+        });
+
+        return ast;
     }
 
     // reads a openapi spec, returns rust ast 
@@ -52,9 +66,33 @@ export module RustServerProcessor {
         return ast;
     }
 
-    function createClass(name: string): {} {
+    function createClass(name: string, fields: {}[]): {} {
         return {
-            "struct": {}
+            "struct": {
+                "ident": name,
+                "fields": {
+                    "named": fields
+                },
+                "attrs": [],
+                "vis": "pub"
+            }
+        };
+    }
+
+    function createClassField(name: string, type: string): {} {
+        return {
+            "vis": "pub",
+            "ident": name,
+            "colon_token": true,
+            "ty": {
+              "path": {
+                "segments": [
+                  {
+                    "ident": type
+                  }
+                ]
+              }
+            }
         };
     }
 }

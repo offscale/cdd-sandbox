@@ -93,17 +93,17 @@ export module State {
         const specUpdate = currentProject.processor.extractSpec(ast);
 
         // merge spec with primary spec
-        // this.spec = OpenAPIProcessor.merge(this.spec, specUpdate);
+        this.spec = OpenAPIProcessor.merge(this.spec, specUpdate);
 
         for (var backgroundProject of this.projects) {
           if (backgroundProject.name != this.currentProject().name) {
             console.log("State.save->Methods.serialise->backgroundProject", backgroundProject.name, this, backgroundProject);
 
-            // this is like hoisting but threaded, typescript is a broken piece of shit.
+            // some stupid state preservation issue in typescript, which is a broken piece of shit.
             let arrrrr = backgroundProject;
 
             // send spec to every project, to update each ast
-            // project.processor.update(project.processor.server, this.spec);
+            arrrrr.ast = arrrrr.processor.merge(arrrrr.ast, this.spec);
 
             // deserialise each ast to code
             Methods.deserialise(backgroundProject.processor.server, backgroundProject.ast).then((result) => {

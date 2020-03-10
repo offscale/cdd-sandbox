@@ -21,8 +21,8 @@ export module Processors {
             server: services.rust,
             syntax: "rust",
             extractSpec: RustServerProcessor.extractSpec,
-            generate: RustServerProcessor.generate,
-            update: RustServerProcessor.update,
+            // generate: RustServerProcessor.generate,
+            merge: RustServerProcessor.merge,
             async getProject(code: string): Promise<Models.Project> {
                 return await Methods.serialise(this.server, code).then((response) => {
                     console.log(response);
@@ -45,8 +45,8 @@ export module Processors {
             syntax: "yaml",
             extractSpec: OpenAPIProcessor.extractSpec,
             getProject: OpenAPIProcessor.getProject,
-            generate: OpenAPIProcessor.generate,
-            update: RustServerProcessor.update
+            // generate: OpenAPIProcessor.generate,
+            merge: OpenAPIProcessor.merge
         },
     };
     export function sync() {

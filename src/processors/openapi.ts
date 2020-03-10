@@ -29,8 +29,24 @@ export module OpenAPIProcessor {
     export function eachComponent(spec: any, fn: (componentName, component) => void) {
         let components = select(spec, '$..components.schemas');
         for (const componentName in components) {
-            fn(componentName, components[componentName]);
+            if(components[componentName].type == "object") {
+                fn(componentName, components[componentName]);
+            }
         }
+    }
+
+    export function eachComponentProperty(spec: any, fn: (propertyName: string, propertyType: string) => void) {
+        for (const propertyName in spec.properties) {
+            fn(propertyName, spec.properties[propertyName].type);
+        }
+    }
+
+    export function selectComponentProperties(spec: any): {name: string, type: string}[] {
+        let properties = [];
+        eachComponentProperty(spec, (propertyName, propertyType) => {
+            properties.push({name: propertyName, type: propertyType});
+        });
+        return properties;
     }
 
     export async function getProject(code: string): Promise<Models.Project> {
