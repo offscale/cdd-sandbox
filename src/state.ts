@@ -72,6 +72,7 @@ export module State {
     }
 
     save() { // sync
+      console.log("State.save", this);
       let currentProject = this.currentProject();
 
       // save the current tab's code (THIS SHOULD HAPPEN ONLY ON VALID CODE)
@@ -79,8 +80,9 @@ export module State {
 
       // try to convert to ast via service adaptor
       Methods.serialise(currentProject.processor.server, currentProject.code).then((result) => {
+        console.log("State.save->Methods.serialise", this, result);
+        
         const ast = result["ast"];
-        console.log(result);
         // memoize ast
         currentProject.ast = ast;
 
@@ -90,13 +92,16 @@ export module State {
         // merge spec with primary spec
         // this.spec = OpenAPIProcessor.merge(this.spec, specUpdate);
 
-        console.log("==");
         for (var project of this.projects) {
-          console.log(project);
           if (project.name != this.selectedTab) {
+            console.log("State.save->Methods.serialise->project", project);
             // send spec to every project, to update each ast
             project.processor.update(project.processor.server, this.spec);
+
             // deserialise each ast to code
+            Methods.deserialise(project.processor.server, project.ast).then((result) => {
+              project.code = result["output"];
+            });
           }
         }
 

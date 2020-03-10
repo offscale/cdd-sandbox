@@ -8,7 +8,7 @@ export module RPC {
     method: string,
     params: any
   ) {
-    console.info(`rpc.call: ${host} -> ${method}`, params);
+    console.info(`RPC.call: ${host} -> ${method}`, params);
 
     const rpc = new RpcWebSocketClient();
     await rpc.connect(host);
@@ -21,8 +21,8 @@ export module RPC {
       );
       return resp;
     }).catch((err) => {
-      ErrorBar.pushError(`rpc.error-response: ${method}: ${err.message}`);
-      console.error(`rpc-error-response: ${host}/${method}: `, err);
+      ErrorBar.pushError(`RPC.error-response: ${method}: ${err.message}`);
+      console.error(`RPC.error-response: ${host}/${method}: `, err);
       return false;
     });
 

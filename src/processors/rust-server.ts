@@ -17,7 +17,6 @@ export module RustServerProcessor {
             console.log("RustServerProcessor.extractSpec(): null ast");
             return {};
         }
-
         const structs = select(ast, '$..struct');
         console.log("RustServerProcessor.extractSpec()", ast, structs);
         if (!Util.isIterable(structs)) {
