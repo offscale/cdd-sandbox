@@ -34,16 +34,21 @@ export module RustServerProcessor {
         return { components: { schemas: components }};
     }
 
+    export async function update(server: string, spec: {}) {
+        let ast = await generate(spec);
+        return Methods.deserialise(server, ast);
+    }
+
     // reads a openapi spec, returns rust ast 
     export async function generate(spec: {}): Promise<{}> {
         console.log("RustServerProcessor.generate()");
 
-        let ast = { items: [{}] };
-        OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
-            console.log(componentName, component);
-            // add models to the ast
-            ast.items.push(createClass(componentName));
-        });
+        let ast = { items: [] };
+        // OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
+        //     console.log(componentName, component);
+        //     // add models to the ast
+        //     ast.items.push(createClass(componentName));
+        // });
 
         return ast;
     }

@@ -9,7 +9,7 @@ let requestsSelector = ".sidebar--items.requests";
 export module Sidebar {
 
   export function update(spec: {}) {
-    console.log('updating sidebar', spec);
+    console.log('Sidebar.update()', spec);
 
     reset();
 

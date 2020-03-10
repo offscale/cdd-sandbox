@@ -88,11 +88,16 @@ export module State {
         const specUpdate = currentProject.processor.extractSpec(ast);
 
         // merge spec with primary spec
-        this.spec = OpenAPIProcessor.merge(this.spec, specUpdate);
+        // this.spec = OpenAPIProcessor.merge(this.spec, specUpdate);
 
+        console.log("==");
         for (var project of this.projects) {
-          // send spec to every project, to update each ast
-          // deserialise each ast to code
+          console.log(project);
+          if (project.name != this.selectedTab) {
+            // send spec to every project, to update each ast
+            project.processor.update(project.processor.server, this.spec);
+            // deserialise each ast to code
+          }
         }
 
         // finally refresh the display

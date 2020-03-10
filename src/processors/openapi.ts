@@ -12,6 +12,7 @@ export module OpenAPIProcessor {
     }
 
     export function merge(left: {}, right: {}): {} {
+        console.log("OpenAPIProcessor.merge()", left, right);
         return right;
     }
 

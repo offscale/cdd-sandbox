@@ -21,7 +21,7 @@ export module RPC {
       );
       return resp;
     }).catch((err) => {
-      ErrorBar.pushError(`rpc.error-response: ${method}: ${err}`);
+      ErrorBar.pushError(`rpc.error-response: ${method}: ${err.message}`);
       console.error(`rpc-error-response: ${host}/${method}: `, err);
       return false;
     });
