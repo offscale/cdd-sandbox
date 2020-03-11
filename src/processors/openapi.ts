@@ -49,10 +49,30 @@ export module OpenAPIProcessor {
         return properties;
     }
 
-    export function createComponent() {
+    export function createComponent(componentName: string) {
         return {
-            type: "object"
+            [componentName]: {
+                type: "object",
+                properties: [],
+                required: []
+            }
         };
+    }
+
+    export function extractVar(field): { name: string, type: string } {
+        let types = select(field, '$..ty..ident');
+        // account for bracketed types
+        // let internal_type = select(field, '$..angle_bracketed..ident')[0];
+
+        return { name: field.ident, type: types.pop() };
+    }
+
+    export function createProperty(propertyName: string, propertyType: string) {
+        return {
+            [propertyName]: {
+                type: propertyType
+            }
+        }
     }
 
     export async function getProject(code: string): Promise<Models.Project> {
