@@ -1,6 +1,4 @@
 import { DOM } from "./dom";
-import { Models } from "./models";
-import { State } from "./state";
 import { OpenAPIProcessor } from "./processors/openapi";
 
 let modelsSelector = ".sidebar--items.models";
@@ -13,11 +11,17 @@ export module Sidebar {
 
     reset();
 
+    // update models
+    const modelsContainer = document.querySelector(modelsSelector);
     OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
-      addModel(componentName);
+      let model = createModel(componentName);
+      OpenAPIProcessor.eachComponentProperty(component, (propertyName, propertyType) => {
+        model.appendChild(createVariable(propertyName, propertyType));
+      });
+      modelsContainer.appendChild(model);
     });
-    // addModels(state.project.models);
-    // addRequests(state.project.requests);
+
+    // update requests
   }
 
   function reset() {
@@ -25,80 +29,97 @@ export module Sidebar {
     modelsContainer.textContent = "";
   }
 
-  function addModel(modelName: string) {
-    const modelsContainer = document.querySelector(modelsSelector);
-
-    var el = DOM.createElement(
+  function createModel(modelName: string) {
+    return DOM.createElement(
       "div",
       ["selectable-item", "model"],
       // document.createTextNode(model["name"])
       document.createTextNode(modelName)
     );
-    // addVariables(model.vars, el);
-    modelsContainer.appendChild(el);
   }
 
-  function addModels(models: Models.Model[]) {
-    let modelsContainer = document.querySelector(modelsSelector);
-    modelsContainer.textContent = "";
-
-    if (models.length == 0) {
-      return;
-    }
-
-    for (let model of models) {
-      var el = DOM.createElement(
-        "div",
-        ["selectable-item", "model"],
-        // document.createTextNode(model["name"])
-        document.createTextNode(model.name)
-      );
-      addVariables(model.vars, el);
-      modelsContainer.appendChild(el);
-    }
+  function createVariable(varName: string, varType: string) {
+    return DOM.createElement(
+      "div",
+      ["member", "variable"],
+      document.createTextNode(`${varName}: ${varType}`)
+    );
   }
 
-  function addRequests(requests) {
-    let requestsContainer = document.querySelector(requestsSelector);
-    requestsContainer.textContent = "";
+  // function addModel(modelName: string) {
+  //   const modelsContainer = document.querySelector(modelsSelector);
 
-    if (requests.length == 0) {
-      return;
-    }
+  //   var el = DOM.createElement(
+  //     "div",
+  //     ["selectable-item", "model"],
+  //     // document.createTextNode(model["name"])
+  //     document.createTextNode(modelName)
+  //   );
+  //   // addVariables(model.vars, el);
+  //   modelsContainer.appendChild(el);
+  // }
 
-    for (let request of requests) {
-      var el = DOM.createElement(
-        "div",
-        ["selectable-item", "request"],
-        document.createTextNode(
-          `${request.name}: ${request.method} ${request.path}`
-        )
-      );
-      addVariables(request.params, el);
-      // addVariables(request.response_type, el);
-      if (request.response_type) {
-        el.appendChild(
-          DOM.createElement(
-            "div",
-            ["return"],
-            document.createTextNode(`-> ${request.response_type.Complex}`)
-          )
-        );
-      }
+  // function addModels(models: Models.Model[]) {
+  //   let modelsContainer = document.querySelector(modelsSelector);
+  //   modelsContainer.textContent = "";
 
-      requestsContainer.appendChild(el);
-    }
-  }
+  //   if (models.length == 0) {
+  //     return;
+  //   }
 
-  function addVariables(variables, element) {
-    for (let variable of variables || []) {
-      element.appendChild(
-        DOM.createElement(
-          "div",
-          ["member"],
-          document.createTextNode(`${variable.name}: ${variable.type}`)
-        )
-      );
-    }
-  }
+  //   for (let model of models) {
+  //     var el = DOM.createElement(
+  //       "div",
+  //       ["selectable-item", "model"],
+  //       // document.createTextNode(model["name"])
+  //       document.createTextNode(model.name)
+  //     );
+  //     addVariables(model.vars, el);
+  //     modelsContainer.appendChild(el);
+  //   }
+  // }
+
+  // function addRequests(requests) {
+  //   let requestsContainer = document.querySelector(requestsSelector);
+  //   requestsContainer.textContent = "";
+
+  //   if (requests.length == 0) {
+  //     return;
+  //   }
+
+  //   for (let request of requests) {
+  //     var el = DOM.createElement(
+  //       "div",
+  //       ["selectable-item", "request"],
+  //       document.createTextNode(
+  //         `${request.name}: ${request.method} ${request.path}`
+  //       )
+  //     );
+  //     addVariables(request.params, el);
+  //     // addVariables(request.response_type, el);
+  //     if (request.response_type) {
+  //       el.appendChild(
+  //         DOM.createElement(
+  //           "div",
+  //           ["return"],
+  //           document.createTextNode(`-> ${request.response_type.Complex}`)
+  //         )
+  //       );
+  //     }
+
+  //     requestsContainer.appendChild(el);
+  //   }
+  // }
+
+  // function addVariables(variables, element) {
+  //   for (let variable of variables || []) {
+  //     element.appendChild(
+  //       DOM.createElement(
+  //         "div",
+  //         ["member"],
+  //         document.createTextNode(`${variable.name}: ${variable.type}`)
+  //       )
+  //     );
+  //   }
+  // }
 }
