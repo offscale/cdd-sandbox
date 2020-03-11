@@ -30,12 +30,12 @@ export module OpenAPIProcessor {
         return ast;
     }
 
-    // iterate over components
-    export function eachComponent(spec: any, fn: (componentName, component, optional) => void) {
+    // iterate over components (models)
+    export function eachComponent(spec: any, fn: (componentName, component) => void) {
         let components = select(spec, '$..components.schemas');
         for (const componentName in components) {
             if(components[componentName].type == "object") {
-                fn(componentName, components[componentName], true);
+                fn(componentName, components[componentName]);
             }
         }
     }

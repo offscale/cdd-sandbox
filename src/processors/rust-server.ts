@@ -60,10 +60,11 @@ export module RustServerProcessor {
         let ast = { items: [] };
 
         // add models to the ast
-        OpenAPIProcessor.eachComponent(spec, (componentName, component, optional) => {
+        OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
             // console.log(componentName, component);
-            let properties = OpenAPIProcessor.selectComponentProperties(component).map((property) => {
-                return createClassField(property["name"], property["type"], optional);
+            let properties = OpenAPIProcessor.selectComponentProperties(component).map(({ name, type }) => {
+                const optional = Util.arrayIncludes(name, component.required);
+                return createClassField(name, type, optional);
             });
             
             ast.items.push(createClass(componentName, properties));
