@@ -26,7 +26,7 @@ export module RustServerProcessor {
         let components = {};
 
         for (const struct of structs) {
-            components[struct["ident"]] = {};
+            components[struct["ident"]] = OpenAPIProcessor.createComponent();
         }
 
         console.log("RustServerProcessor.extractSpec() -> ", components);

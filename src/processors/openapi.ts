@@ -49,6 +49,12 @@ export module OpenAPIProcessor {
         return properties;
     }
 
+    export function createComponent() {
+        return {
+            type: "object"
+        };
+    }
+
     export async function getProject(code: string): Promise<Models.Project> {
         return await Methods.serialise(this.server, code).then((response) => {
 

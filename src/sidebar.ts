@@ -22,6 +22,7 @@ export module Sidebar {
     });
 
     // update requests
+    let requestsContainer = document.querySelector(requestsSelector);
   }
 
   function reset() {
