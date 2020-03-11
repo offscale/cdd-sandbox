@@ -3,6 +3,7 @@ import { Methods } from "../methods";
 import { State } from "../state";
 
 const { JSONPath } = require('jsonpath-plus');
+// import * as _ from "lodash";
 const nodejq = require("jq-in-the-browser").default;
 
 export module OpenAPIProcessor {
@@ -11,9 +12,13 @@ export module OpenAPIProcessor {
 
     }
 
-    export function merge(left: {}, right: {}): {} {
-        console.log("OpenAPIProcessor.merge()", left, right);
-        return right;
+    export function merge(left: {}, right: {}) {
+        console.log("-> OpenAPIProcessor.merge()", left, right);
+        // Object.assign(left, right);
+        // return right;
+        Object.assign(left["components"], right["components"]);
+        console.log("<- OpenAPIProcessor.merge()", left);
+        return left;
     }
 
     // reads current spec, returns code
@@ -53,7 +58,7 @@ export module OpenAPIProcessor {
         return {
             [componentName]: {
                 type: "object",
-                properties: [],
+                properties: {},
                 required: []
             }
         };

@@ -18,7 +18,7 @@ export module RustServerProcessor {
             return {};
         }
         const structs = select(ast, '$..struct');
-        console.log("RustServerProcessor.extractSpec()", ast, structs);
+        console.log("-> RustServerProcessor.extractSpec()", ast, structs);
         if (!Util.isIterable(structs)) {
             return {};
         }
@@ -37,13 +37,14 @@ export module RustServerProcessor {
             }
         }
 
-        console.log("RustServerProcessor.extractSpec() -> ", components);
+        console.log("<- RustServerProcessor.extractSpec()", components);
         return { components: { schemas: components }};
     }
 
     // takes an openapi spec, updates ast
     export function merge(currentast: {}, spec: {}) {
-        console.log("RustServerProcessor.generate()");
+        console.log("RustServerProcessor.merge()");
+        // todo: increase complexity of this merge to not touch unrelated ast constructs.
 
         let ast = { items: [] };
 
@@ -57,22 +58,23 @@ export module RustServerProcessor {
             ast.items.push(createClass(componentName, properties));
         });
 
+        // currentast = ast;
         return ast;
     }
 
-    // reads a openapi spec, returns rust ast 
-    export async function generate(spec: {}): Promise<{}> {
-        console.log("RustServerProcessor.generate()");
+    // // reads a openapi spec, returns rust ast 
+    // export async function generate(spec: {}): Promise<{}> {
+    //     console.log("RustServerProcessor.generate()");
 
-        let ast = { items: [] };
-        // OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
-        //     console.log(componentName, component);
-        //     // add models to the ast
-        //     ast.items.push(createClass(componentName));
-        // });
+    //     let ast = { items: [] };
+    //     // OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
+    //     //     console.log(componentName, component);
+    //     //     // add models to the ast
+    //     //     ast.items.push(createClass(componentName));
+    //     // });
 
-        return ast;
-    }
+    //     return ast;
+    // }
 
     function createClass(name: string, fields: {}[]): {} {
         return {
