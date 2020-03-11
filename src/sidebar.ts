@@ -15,8 +15,8 @@ export module Sidebar {
     const modelsContainer = document.querySelector(modelsSelector);
     OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
       let model = createModel(componentName);
-      OpenAPIProcessor.eachComponentProperty(component, (propertyName, propertyType) => {
-        model.appendChild(createVariable(propertyName, propertyType));
+      OpenAPIProcessor.eachComponentProperty(component, (propertyName, propertyType, optional) => {
+        model.appendChild(createVariable(propertyName, propertyType, optional));
       });
       modelsContainer.appendChild(model);
     });
@@ -39,11 +39,13 @@ export module Sidebar {
     );
   }
 
-  function createVariable(varName: string, varType: string) {
+  function createVariable(varName: string, varType: string, optional: boolean) {
+    const optionalAsterisk = optional ? "" : "*";
+
     return DOM.createElement(
       "div",
       ["member", "variable"],
-      document.createTextNode(`${varName}: ${varType}`)
+      document.createTextNode(`${varName}: ${optionalAsterisk}${varType}`)
     );
   }
 

@@ -1,6 +1,6 @@
 import { Models } from "../models";
 import { Methods } from "../methods";
-import { State } from "../state";
+import { Util } from "../utils";
 
 const { JSONPath } = require('jsonpath-plus');
 // import * as _ from "lodash";
@@ -31,18 +31,19 @@ export module OpenAPIProcessor {
     }
 
     // iterate over components
-    export function eachComponent(spec: any, fn: (componentName, component) => void) {
+    export function eachComponent(spec: any, fn: (componentName, component, optional) => void) {
         let components = select(spec, '$..components.schemas');
         for (const componentName in components) {
             if(components[componentName].type == "object") {
-                fn(componentName, components[componentName]);
+                fn(componentName, components[componentName], true);
             }
         }
     }
 
-    export function eachComponentProperty(spec: any, fn: (propertyName: string, propertyType: string) => void) {
+    export function eachComponentProperty(spec: any, fn: (propertyName: string, propertyType: string, optional: boolean) => void) {
         for (const propertyName in spec.properties) {
-            fn(propertyName, spec.properties[propertyName].type);
+            let optional = !Util.arrayIncludes(propertyName, spec.required);
+            fn(propertyName, spec.properties[propertyName].type, optional);
         }
     }
 
@@ -62,14 +63,6 @@ export module OpenAPIProcessor {
                 required: []
             }
         };
-    }
-
-    export function extractVar(field): { name: string, type: string } {
-        let types = select(field, '$..ty..ident');
-        // account for bracketed types
-        // let internal_type = select(field, '$..angle_bracketed..ident')[0];
-
-        return { name: field.ident, type: types.pop() };
     }
 
     export function createProperty(propertyName: string, propertyType: string) {

@@ -1,6 +1,3 @@
-import { Models } from "../models";
-import { Methods } from "../methods";
-import { State } from "../state";
 import { OpenAPIProcessor } from "./openapi";
 import { Util } from "../utils";
 
@@ -32,13 +29,27 @@ export module RustServerProcessor {
                 OpenAPIProcessor.createComponent(structName));
 
             for (const field of struct.fields.named) {
+                let property = extractVar(field);
+                if (property.optional) {
+                    components[structName].required.push(property.name);
+                };
                 Object.assign(components[structName].properties,
-                    OpenAPIProcessor.createProperty(field.ident, OpenAPIProcessor.extractVar(field).type ));
+                    OpenAPIProcessor.createProperty(property.name, property.type ));
             }
         }
 
         console.log("<- RustServerProcessor.extractSpec()", components);
         return { components: { schemas: components }};
+    }
+
+    // takes variable ast, returns generic object
+    function extractVar(field: { ident: string }): { name: string, type: string, optional: boolean } {
+        let types = select(field, '$..ty..ident');
+        // account for bracketed types
+        // let internal_type = select(field, '$..angle_bracketed..ident')[0];
+        console.log("RustServerProcessor.extractVar()", field, types);
+
+        return { name: field.ident, type: types.pop(), optional: Util.arrayIncludes('Option', types) };
     }
 
     // takes an openapi spec, updates ast
@@ -49,10 +60,10 @@ export module RustServerProcessor {
         let ast = { items: [] };
 
         // add models to the ast
-        OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
+        OpenAPIProcessor.eachComponent(spec, (componentName, component, optional) => {
             // console.log(componentName, component);
             let properties = OpenAPIProcessor.selectComponentProperties(component).map((property) => {
-                return createClassField(property["name"], property["type"]);
+                return createClassField(property["name"], property["type"], optional);
             });
             
             ast.items.push(createClass(componentName, properties));
@@ -89,21 +100,53 @@ export module RustServerProcessor {
         };
     }
 
-    function createClassField(name: string, type: string): {} {
+    function createOptionalField(type: string): {} {
+        return {
+            "ident": "Option",
+            arguments: {
+                angle_bracketed: {
+                    args: [
+                        {
+                            type: {
+                                path: {
+                                    segments: [
+                                        { ident: type }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        };
+    }
+
+    function createClassField(name: string, type: string, optional: boolean): {} {
+        let ident = optional ? createOptionalField(type) : { "ident": type };
         return {
             "vis": "pub",
             "ident": name,
             "colon_token": true,
             "ty": {
               "path": {
-                "segments": [
-                  {
-                    "ident": type
-                  }
-                ]
+                "segments": [ ident ]
               }
             }
         };
+        // return {
+        //     "vis": "pub",
+        //     "ident": name,
+        //     "colon_token": true,
+        //     "ty": {
+        //       "path": {
+        //         "segments": [
+        //           {
+        //             "ident": type
+        //           }
+        //         ]
+        //       }
+        //     }
+        // };
     }
 }
 
