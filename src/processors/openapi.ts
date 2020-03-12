@@ -83,6 +83,13 @@ export module OpenAPIProcessor {
         return properties;
     }
 
+    export function selectRequestParams(spec: any) {
+        if (!spec.parameters) { return []; }
+        return spec.parameters.map((param) => {
+            return { name: param.name, type: param.schema.type };
+        });
+    }
+
     export function createComponent(componentName: string) {
         return {
             [componentName]: {

@@ -1,6 +1,5 @@
 import { OpenAPIProcessor } from "./openapi";
 import { Util } from "../utils";
-import { match } from "assert";
 
 const { JSONPath } = require('jsonpath-plus');
 const nodejq = require("jq-in-the-browser").default;
@@ -71,8 +70,41 @@ export module RustServerProcessor {
             ast.items.push(createClass(componentName, properties));
         });
 
+        // add requests to the ast
+        OpenAPIProcessor.eachRequest(spec, (requestName, requestMethod, requestPath, request) => {
+            let params = OpenAPIProcessor.selectRequestParams(request).map(({name, type}) => {
+                return createFunctionParam(name, fromType(type));
+            });
+            ast.items.push(createFunction(requestName, params, []));
+        })
+
         // currentast = ast;
         return ast;
+    }
+
+    function createFunctionParam(name: string, type: string): {} {
+        return {
+            "typed": {
+                "pat": {
+                    "ident": {"ident": name}
+                    },
+                    "ty": {
+                        "path": {
+                            "segments": [{ "ident": type }]
+                    }
+                }
+            }
+        };
+    }
+
+    function createFunction(functionName: string, params: [], content: {}): {} {
+        return {
+            "fn": {
+                "ident": functionName,
+                "stmts": content,
+                "inputs": params
+            }
+        };
     }
 
     // // reads a openapi spec, returns rust ast 
@@ -89,7 +121,7 @@ export module RustServerProcessor {
     //     return ast;
     // }
 
-    // convert from openapi type to rust type
+    /// convert from openapi type to rust type
     function fromType(type: string): string {
         switch (type) {
             case "integer": return "i64";
@@ -98,7 +130,7 @@ export module RustServerProcessor {
         }
     }
 
-    // convert from rust type to openapi type
+    /// convert from rust type to openapi type
     function toType(type: string): string {
         switch (type) {
             case "i64": return "integer";
