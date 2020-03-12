@@ -1,5 +1,5 @@
 import { Models } from "./models";
-import { Processors } from "./processors";
+import { Processors } from "./processors/processors";
 import { UI } from "./ui";
 import { Methods } from "./methods";
 import { OpenAPIProcessor } from "./processors/openapi";

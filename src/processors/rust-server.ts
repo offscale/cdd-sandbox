@@ -1,5 +1,6 @@
 import { OpenAPIProcessor } from "./openapi";
 import { Util } from "../utils";
+import { match } from "assert";
 
 const { JSONPath } = require('jsonpath-plus');
 const nodejq = require("jq-in-the-browser").default;
@@ -34,7 +35,7 @@ export module RustServerProcessor {
                     components[structName].required.push(property.name);
                 };
                 Object.assign(components[structName].properties,
-                    OpenAPIProcessor.createProperty(property.name, property.type ));
+                    OpenAPIProcessor.createProperty(property.name, toType(property.type) ));
             }
         }
 
@@ -64,7 +65,7 @@ export module RustServerProcessor {
             // console.log(componentName, component);
             let properties = OpenAPIProcessor.selectComponentProperties(component).map(({ name, type }) => {
                 const optional = Util.arrayIncludes(name, component.required);
-                return createClassField(name, type, optional);
+                return createClassField(name, fromType(type), optional);
             });
             
             ast.items.push(createClass(componentName, properties));
@@ -87,6 +88,24 @@ export module RustServerProcessor {
 
     //     return ast;
     // }
+
+    // convert from openapi type to rust type
+    function fromType(type: string): string {
+        switch (type) {
+            case "integer": return "i64";
+            case "string": return "String";
+            default: return "unknown";
+        }
+    }
+
+    // convert from rust type to openapi type
+    function toType(type: string): string {
+        switch (type) {
+            case "i64": return "integer";
+            case "String": return "string";
+            default: return "unknown";
+        }
+    }
 
     function createClass(name: string, fields: {}[]): {} {
         return {

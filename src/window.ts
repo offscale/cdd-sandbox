@@ -2,7 +2,7 @@ import { State } from "./state";
 import { Editor } from "./editor";
 import { Methods } from "./methods";
 import { Tabs } from "./tabs";
-import { Processors } from "./processors";
+import { Processors } from "./processors/processors";
 import { UI } from "./ui";
 
 export module Window {

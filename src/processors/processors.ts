@@ -1,10 +1,10 @@
-import { Methods } from "./methods";
-import { Models } from "./models";
+import { Methods } from "../methods";
+import { Models } from "../models";
 const { JSONPath } = require('jsonpath-plus');
 const nodejq = require("jq-in-the-browser").default;
 
-import { OpenAPIProcessor } from "./processors/openapi";
-import { RustServerProcessor } from "./processors/rust-server";
+import { OpenAPIProcessor } from "./openapi";
+import { RustServerProcessor } from "./rust-server";
 
 // tip: use https://jsonpath.com/ and https://duckduckgo.com/?q=json+format https://github.com/s3u/JSONPath
 // json templating: https://www.npmjs.com/package/jsonpath-object-transform
@@ -14,9 +14,14 @@ import { RustServerProcessor } from "./processors/rust-server";
 export module Processors {
     export let services = {
         "rust": "ws://localhost:7779",
+        "typescript": "ws://localhost:7778",
         "openapi": "ws://localhost:7777"
     };
     export let processors = {
+        "typescript-client": {
+            server: services.typescript,
+            syntax: "typescript"
+        },
         "rust-server": {
             server: services.rust,
             syntax: "rust",
