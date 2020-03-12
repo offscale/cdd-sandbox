@@ -23,18 +23,33 @@ export module Sidebar {
 
     // update requests
     let requestsContainer = document.querySelector(requestsSelector);
+    OpenAPIProcessor.eachRequest(spec, (requestName, requestMethod, requestPath, request) => {
+      let requestEl = createRequest(requestName, requestMethod, requestPath);
+      OpenAPIProcessor.eachRequestParam(request, (paramName, paramType, optional) => {
+        requestEl.appendChild(createVariable(paramName, paramType, optional));
+      })
+      requestEl.appendChild(createReturn(OpenAPIProcessor.extractReturnType(request), false));
+      requestsContainer.appendChild(requestEl);
+    });
   }
 
   function reset() {
-    const modelsContainer = document.querySelector(modelsSelector);
-    modelsContainer.textContent = "";
+    document.querySelector(modelsSelector).textContent = "";
+    document.querySelector(requestsSelector).textContent = "";
+  }
+
+  function createRequest(requestName: string, requestMethod: string, requestPath: string) {
+    return DOM.createElement(
+      "div",
+      ["selectable-item", "request"],
+      document.createTextNode(`${requestName}: ${requestMethod} ${requestPath}`)
+    );
   }
 
   function createModel(modelName: string) {
     return DOM.createElement(
       "div",
       ["selectable-item", "model"],
-      // document.createTextNode(model["name"])
       document.createTextNode(modelName)
     );
   }
@@ -47,6 +62,14 @@ export module Sidebar {
       ["member", "variable"],
       document.createTextNode(`${varName}: ${optionalAsterisk}${varType}`)
     );
+  }
+
+  function createReturn(varType: string, optional: boolean) {
+    return DOM.createElement(
+      "div",
+      ["return"],
+      document.createTextNode(`-> ${varType}`)
+    )
   }
 
   // function addModel(modelName: string) {

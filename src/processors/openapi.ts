@@ -30,6 +30,34 @@ export module OpenAPIProcessor {
         return ast;
     }
 
+    export function eachRequest(spec: any, fn: (requestName, requestMethod, requestPath, request) => void) {
+        for (const requestPath in spec.paths) {
+            for (const requestMethod in spec.paths[requestPath]) {
+                let request = spec.paths[requestPath][requestMethod];
+                let requestName = request.operationId;
+                fn(requestName, requestMethod, requestPath, request);
+            }
+        }
+    }
+
+    export function eachRequestParam(spec: { parameters: [{name: string, schema: { type: string }}]}, fn: (paramName: string, paramType: string, optional: boolean) => void) {
+        if(!spec.parameters) { return; }
+        for (const param of spec.parameters) {
+            fn(param.name, param.schema.type, true);
+        }
+    }
+
+    export function extractReturnType(spec: {}): string {
+        let responses = select(spec, '$.responses..schema.$ref');
+        return extractTypeFromRef(responses[0]);
+    }
+
+    // extract a type from a ref string eg: 
+    function extractTypeFromRef(ref: string): string {
+        // todo: fix
+        return ref.split("/").pop();
+    }
+
     // iterate over components (models)
     export function eachComponent(spec: any, fn: (componentName, component) => void) {
         let components = select(spec, '$..components.schemas');
