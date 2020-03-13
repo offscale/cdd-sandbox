@@ -1,5 +1,6 @@
 import { OpenAPIProcessor } from "./openapi";
 import { Util } from "../utils";
+import * as _ from "lodash";
 
 const { JSONPath } = require('jsonpath-plus');
 const nodejq = require("jq-in-the-browser").default;
@@ -15,31 +16,37 @@ export module RustServerProcessor {
             return {};
         }
         const structs = select(ast, '$..struct');
-        console.log("-> RustServerProcessor.extractSpec()", ast, structs);
         if (!Util.isIterable(structs)) {
             return {};
         }
 
-        let components = {};
+        let spec = { components: { schemas: {} }, paths: {} };
 
         for (const struct of structs) {
             const structName = struct.ident;
 
-            Object.assign(components,
+            Object.assign(spec.components.schemas,
                 OpenAPIProcessor.createComponent(structName));
 
             for (const field of struct.fields.named) {
                 let property = extractVar(field);
                 if (property.optional) {
-                    components[structName].required.push(property.name);
+                    spec.components.schemas[structName].required.push(property.name);
                 };
-                Object.assign(components[structName].properties,
+                Object.assign(spec.components.schemas[structName].properties,
                     OpenAPIProcessor.createProperty(property.name, toType(property.type) ));
             }
         }
 
-        console.log("<- RustServerProcessor.extractSpec()", components);
-        return { components: { schemas: components }};
+        for (const fn of select(ast, '$..fn')) {
+            const fnName = fn.ident;
+            // spec.paths["path"]["method"] = OpenAPIProcessor.createPath("path", "GET", fnName);
+            spec.paths = _.merge(OpenAPIProcessor.createPath(fnName, "get", fnName), spec.paths);
+
+        }
+
+        console.log("<- RustServerProcessor.extractSpec()", spec);
+        return spec;
     }
 
     // takes variable ast, returns generic object
@@ -101,8 +108,98 @@ export module RustServerProcessor {
         return {
             "fn": {
                 "ident": functionName,
-                "stmts": content,
-                "inputs": params
+                "stmts": [
+                    {
+                      "expr": {
+                        "call": {
+                          "args": [
+                            {
+                              "lit": {
+                                "str": "\"GET\""
+                              }
+                            },
+                            {
+                              "lit": {
+                                "str": "\"/pets/{petId}\""
+                              }
+                            },
+                            {
+                              "macro": {
+                                "delimiter": "bracket",
+                                "path": {
+                                  "segments": [
+                                    {
+                                      "ident": "vec"
+                                    }
+                                  ]
+                                },
+                                "tokens": [
+                                  {
+                                    "group": {
+                                      "delimiter": "parenthesis",
+                                      "stream": [
+                                        {
+                                          "lit": "\"petId\""
+                                        },
+                                        {
+                                          "punct": {
+                                            "op": ",",
+                                            "spacing": "alone"
+                                          }
+                                        },
+                                        {
+                                          "ident": "petId"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "func": {
+                            "path": {
+                              "segments": [
+                                {
+                                  "ident": "ApiBase"
+                                },
+                                {
+                                  "ident": "call"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                "inputs": params,
+                "output": {
+                    "path": {
+                      "segments": [
+                        {
+                          "arguments": {
+                            "angle_bracketed": {
+                              "args": [
+                                {
+                                  "type": {
+                                    "path": {
+                                      "segments": [
+                                        {
+                                          "ident": "Error"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          "ident": "ApiResult"
+                        }
+                      ]
+                    }
+                  },
             }
         };
     }

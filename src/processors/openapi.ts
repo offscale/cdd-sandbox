@@ -49,7 +49,9 @@ export module OpenAPIProcessor {
 
     export function extractReturnType(spec: {}): string {
         let responses = select(spec, '$.responses..schema.$ref');
-        return extractTypeFromRef(responses[0]);
+        if (responses) {
+            return extractTypeFromRef(responses[0]);
+        }
     }
 
     // extract a type from a ref string eg: 
@@ -96,6 +98,21 @@ export module OpenAPIProcessor {
                 type: "object",
                 properties: {},
                 required: []
+            }
+        };
+    }
+
+    export function createPath(path: string, pathMethod: string, pathName: string) {
+        return {
+            [path]: {
+                [pathMethod]: {
+                    tags: [],
+                    summary: "",
+                    operationId: pathName,
+                    parameters: [],
+                    responses: {   
+                    }
+                }
             }
         };
     }
