@@ -92,6 +92,15 @@ export module OpenAPIProcessor {
         });
     }
 
+    export function createRequestParameter(paramName: string, paramType: string): {} {
+        return {
+            name: paramName,
+            schema: {
+                type: paramType
+            }
+        };
+    }
+
     export function createComponent(componentName: string) {
         return {
             [componentName]: {

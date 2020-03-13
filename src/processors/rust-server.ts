@@ -48,7 +48,9 @@ export module RustServerProcessor {
             spec.paths = _.merge(OpenAPIProcessor.createPath(fnPath, fnMethod, fnName), spec.paths);
             spec.paths[fnPath][fnMethod].responses = OpenAPIProcessor.createResponse(fnReturnType);
             if (fnParams) {
-                spec.paths[fnPath][fnMethod].args = fnParams;
+                spec.paths[fnPath][fnMethod].parameters = fnParams.map((param) => {
+                  return OpenAPIProcessor.createRequestParameter(param.paramName, param.paramType)
+                });
             }
         }
 
@@ -66,13 +68,14 @@ export module RustServerProcessor {
         }
     }
 
-    function extractFunctionParams(spec: { args: [] }): {paramName, paramType}[] {
-        if (!spec.args) {
+    function extractFunctionParams(spec: { inputs: [] }): {paramName, paramType}[] {
+        if (!spec.inputs) {
             return [];
         }
-        return spec.args.map((arg) => {
+        return spec.inputs.map((arg) => {
             let paramName = select(arg, '$.typed..ident.ident')[0];
             let paramType = select(arg, '$.typed..ty..ident')[0];
+          console.log("-----", paramName, paramType);
             return { paramName: paramName, paramType: paramType };
         });
     }
