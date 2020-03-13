@@ -75,7 +75,6 @@ export module RustServerProcessor {
         return spec.inputs.map((arg) => {
             let paramName = select(arg, '$.typed..ident.ident')[0];
             let paramType = select(arg, '$.typed..ty..ident')[0];
-          console.log("-----", paramName, paramType);
             return { paramName: paramName, paramType: paramType };
         });
     }
@@ -331,6 +330,6 @@ function transform(json:any, transform: string): {} {
 
 function select(json: any, path: string) {
     const selector = JSONPath({path: path, json: json, wrap: false});
-    console.log('select():', selector);
+    // console.log('select():', selector);
     return selector;
 }

@@ -12,12 +12,18 @@ export module OpenAPIProcessor {
 
     }
 
-    export function merge(left: {}, right: {}) {
+    // right is new spec, left previous
+    export function merge(left: any, right: any) {
         console.log("-> OpenAPIProcessor.merge()", left, right);
         // Object.assign(left, right);
         // return right;
         Object.assign(left["components"], right["components"]);
         console.log("<- OpenAPIProcessor.merge()", left);
+        // left.components = right.components;
+        // left.paths = right.components;
+
+        Object.assign(left, right);
+
         return left;
     }
 
