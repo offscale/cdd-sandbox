@@ -40,13 +40,59 @@ export module RustServerProcessor {
 
         for (const fn of select(ast, '$..fn')) {
             const fnName = fn.ident;
+            const fnPath = extractRequestPath(fn); // fix
+            const fnMethod = extractRequestMethod(fn);
+            const fnReturnType = extractReturnType(fn);
+            const fnParams = extractFunctionParams(fn);
             // spec.paths["path"]["method"] = OpenAPIProcessor.createPath("path", "GET", fnName);
-            spec.paths = _.merge(OpenAPIProcessor.createPath(fnName, "get", fnName), spec.paths);
-
+            spec.paths = _.merge(OpenAPIProcessor.createPath(fnPath, fnMethod, fnName), spec.paths);
+            spec.paths[fnPath][fnMethod].responses = OpenAPIProcessor.createResponse(fnReturnType);
+            if (fnParams) {
+                spec.paths[fnPath][fnMethod].args = fnParams;
+            }
         }
 
         console.log("<- RustServerProcessor.extractSpec()", spec);
         return spec;
+    }
+
+    function extractRequestPath(spec: {}): string {
+        let responses = select(spec, '$..str');
+        if (!responses) { return; }
+        for (const response of responses) {
+            if (response.includes("/") == true) {
+                return response.replace(/\"/, "").replace(/\"/, "");
+            }
+        }
+    }
+
+    function extractFunctionParams(spec: { args: [] }): {paramName, paramType}[] {
+        if (!spec.args) {
+            return [];
+        }
+        return spec.args.map((arg) => {
+            let paramName = select(arg, '$.typed..ident.ident')[0];
+            let paramType = select(arg, '$.typed..ty..ident')[0];
+            return { paramName: paramName, paramType: paramType };
+        });
+    }
+
+    function extractRequestMethod(spec: {}): string {
+        let responses = select(spec, '$..str');
+        if (!responses) { return; }
+        if (Util.arrayIncludes("\"GET\"", responses)) {
+            return "get";
+        }
+        if (Util.arrayIncludes("\"POST\"", responses)) {
+            return "post";
+        }
+    }
+
+    function extractReturnType(spec: {}): string {
+        let responses = select(spec, '$.output..ident');
+        if (responses) {
+            return responses.pop();
+        };
     }
 
     // takes variable ast, returns generic object
@@ -82,7 +128,11 @@ export module RustServerProcessor {
             let params = OpenAPIProcessor.selectRequestParams(request).map(({name, type}) => {
                 return createFunctionParam(name, fromType(type));
             });
-            ast.items.push(createFunction(requestName, params, []));
+            let requestCallStatement = createRequestCall(requestPath, requestMethod);
+            console.log("requestCallStatement", requestCallStatement);
+            ast.items.push(createFunction(requestName, params, [
+              requestCallStatement
+            ], OpenAPIProcessor.extractReturnType(request)));
         })
 
         // currentast = ast;
@@ -104,104 +154,77 @@ export module RustServerProcessor {
         };
     }
 
-    function createFunction(functionName: string, params: [], content: {}): {} {
+    function createFunction(functionName: string, params: [], content: {}, returnType: string): {} {
         return {
             "fn": {
                 "ident": functionName,
-                "stmts": [
-                    {
-                      "expr": {
-                        "call": {
-                          "args": [
-                            {
-                              "lit": {
-                                "str": "\"GET\""
-                              }
-                            },
-                            {
-                              "lit": {
-                                "str": "\"/pets/{petId}\""
-                              }
-                            },
-                            {
-                              "macro": {
-                                "delimiter": "bracket",
-                                "path": {
-                                  "segments": [
-                                    {
-                                      "ident": "vec"
-                                    }
-                                  ]
-                                },
-                                "tokens": [
-                                  {
-                                    "group": {
-                                      "delimiter": "parenthesis",
-                                      "stream": [
-                                        {
-                                          "lit": "\"petId\""
-                                        },
-                                        {
-                                          "punct": {
-                                            "op": ",",
-                                            "spacing": "alone"
-                                          }
-                                        },
-                                        {
-                                          "ident": "petId"
-                                        }
-                                      ]
-                                    }
-                                  }
-                                ]
-                              }
-                            }
-                          ],
-                          "func": {
+                "stmts": content,
+                "inputs": params,
+                "output": createFunctionReturnType(returnType, "ApiBase"),
+            }
+        };
+    }
+
+    function createRequestCall(requestPath: string, requestMethod: string) {
+      return {
+        "expr": {
+          "call": {
+            "func": {
+              "path": {
+                "segments": [
+                  {
+                    "ident": "ApiBase"
+                  },
+                  {
+                    "ident": "call"
+                  }
+                ]
+              }
+            },
+            "args": [
+              {
+                "lit": {
+                  "str": `\"${requestMethod.toUpperCase()}\"`
+                }
+              },
+              {
+                "lit": {
+                  "str": `\"${requestPath}\"`
+                }
+              }
+            ]
+          }
+        }
+      };
+    }
+
+    function createFunctionReturnType(type: string, bracketType: string): {} {
+        return {
+            "path": {
+              "segments": [
+                {
+                  "arguments": {
+                    "angle_bracketed": {
+                      "args": [
+                        {
+                          "type": {
                             "path": {
                               "segments": [
                                 {
-                                  "ident": "ApiBase"
-                                },
-                                {
-                                  "ident": "call"
+                                  "ident": type
                                 }
                               ]
                             }
                           }
                         }
-                      }
-                    }
-                  ],
-                "inputs": params,
-                "output": {
-                    "path": {
-                      "segments": [
-                        {
-                          "arguments": {
-                            "angle_bracketed": {
-                              "args": [
-                                {
-                                  "type": {
-                                    "path": {
-                                      "segments": [
-                                        {
-                                          "ident": "Error"
-                                        }
-                                      ]
-                                    }
-                                  }
-                                }
-                              ]
-                            }
-                          },
-                          "ident": "ApiResult"
-                        }
                       ]
                     }
                   },
+                  "ident": bracketType
+                }
+              ]
             }
-        };
+          };
     }
 
     // // reads a openapi spec, returns rust ast 

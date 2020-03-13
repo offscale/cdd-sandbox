@@ -42,7 +42,7 @@ export module Sidebar {
     return DOM.createElement(
       "div",
       ["selectable-item", "request"],
-      document.createTextNode(`${requestName}: ${requestMethod} ${requestPath}`)
+      document.createTextNode(`${requestMethod.toUpperCase()} ${requestPath}`)
     );
   }
 

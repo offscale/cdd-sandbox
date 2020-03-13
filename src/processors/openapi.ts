@@ -102,6 +102,20 @@ export module OpenAPIProcessor {
         };
     }
 
+    export function createResponse(responseType: string): {} {
+        return {
+            default: {
+                content: {
+                    ["application/json"]: {
+                        schema: {
+                            "$ref": `#/components/schemas/${responseType}`
+                        }
+                    }
+                }
+            }
+        };
+    }
+
     export function createPath(path: string, pathMethod: string, pathName: string) {
         return {
             [path]: {
