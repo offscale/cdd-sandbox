@@ -1,4 +1,5 @@
 import { Models } from "./models";
+import { State } from "./state";
 
 var ace = require("brace");
 require("brace/mode/javascript");
@@ -17,5 +18,15 @@ export module Editor {
     editor.setTheme("ace/theme/monokai");
 
     return editor;
+  }
+
+  export function update(appState: State.AppState) {
+    if (appState.selectedTab) {
+      let currentProject = appState.currentProject();
+
+      appState.editor.getSession().setMode(`ace/mode/${currentProject.syntax}`);
+      appState.editor.setValue(currentProject.code);
+      appState.editor.clearSelection();
+    }
   }
 }

@@ -1,9 +1,11 @@
 { pkgs ? import <nixpkgs> { } }:
 pkgs.mkShell {
-  name = "rust-env";
+  name = "typescript-env";
 
   buildInputs = with pkgs; [
     nodejs
+    nodePackages.typescript
+    # nodePackages.jq
   ];
 
   shellHook = "";
