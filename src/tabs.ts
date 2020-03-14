@@ -1,22 +1,24 @@
-import { DOM } from "./dom";
-import { Models } from "./models";
 import { State } from "./state";
 import { UI } from "./ui";
+import { Processors } from "./processors/processors";
 
 let tabsContainerSelector = ".tab-bar";
 let tabsSelector = ".tab-bar--tab";
 let activeTabSelector = ".tab-bar--tab.active";
+const maxProjects = 3;
 
 // todo: this should not write to state
 
 export module Tabs {
     export function init(state: State.AppState) {
-        for (let project of state.projects) {
+        document.querySelector(tabsContainerSelector).textContent = '';
+
+        for (let project of state.projects.slice().reverse()) { // slice because reverse mutates (dumb)
             // add tabs
             document
-              .querySelector(".tab-bar")
+              .querySelector(tabsContainerSelector)
               .insertAdjacentHTML(
-                "beforeend",
+                "afterbegin",
                 `<div class='column tab-bar--tab ${project.name}'>${project.description}</div>`
               );
       
@@ -27,6 +29,31 @@ export module Tabs {
                 state.clickTab(project.name);
                 UI.update(state);
               });
+        }
+
+        Tabs.update(state);
+
+        if (state.projects.length < maxProjects) {
+          document
+          .querySelector(tabsContainerSelector)
+          .insertAdjacentHTML(
+            "beforeend",
+            `<div class='column tab-bar--tab new-project'>+</div>`
+          );
+          document.querySelector('.tab-bar--tab.new-project')
+          .addEventListener("click", event => {
+            console.log("new project clicked");
+            state.projects.push({
+              name: "typescript",
+              description: "Web Frontend (Typescript)",
+              processor: Processors.processors["openapi"],
+              syntax: "typescript",
+              ast: {},
+              code: "function main() { }",
+            });
+            Tabs.update(state);
+            UI.update(state);
+          });
         }
     }
 

@@ -6,6 +6,7 @@ import { Editor } from "./editor";
 export module UI {
     export function update(appState: State.AppState) {
         console.log("UI.update", appState);
+        Tabs.init(appState);
         Tabs.update(appState);
         Editor.update(appState);
 
