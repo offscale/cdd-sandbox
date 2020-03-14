@@ -246,6 +246,8 @@ export module RustServerProcessor {
     /// convert from openapi type to rust type
     function fromType(type: string): string {
         switch (type) {
+            case "boolean": return "bool"
+            case "float": return "f64";
             case "integer": return "i64";
             case "string": return "String";
             default: return "unknown";
@@ -255,8 +257,18 @@ export module RustServerProcessor {
     /// convert from rust type to openapi type
     function toType(type: string): string {
         switch (type) {
-            case "i64": return "integer";
-            case "String": return "string";
+            case "bool":
+              return "boolean";
+            case "float":
+              return "f64";
+            case "i32":
+            case "u32":
+            case "u64":
+            case "i64":
+              return "integer";
+            case "&str":
+            case "String":
+              return "string";
             default: return "unknown";
         }
     }
