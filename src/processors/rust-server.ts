@@ -6,10 +6,6 @@ const { JSONPath } = require('jsonpath-plus');
 const nodejq = require("jq-in-the-browser").default;
 
 export module RustServerProcessor {
-    // extract a project model so the sidebar updates
-    // export async function getProject(code: string): Promise<Models.Project> {
-    // }
-
     export function extractSpec(ast: {}): {} {
         if (!ast) {
             console.log("RustServerProcessor.extractSpec(): null ast");
@@ -26,7 +22,7 @@ export module RustServerProcessor {
             const structName = struct.ident;
 
             Object.assign(spec.components.schemas,
-                OpenAPIProcessor.createComponent(structName));
+                OpenAPIProcessor.createObjectComponent(structName));
 
             for (const field of struct.fields.named) {
                 let property = extractVar(field);
@@ -44,9 +40,15 @@ export module RustServerProcessor {
             const fnMethod = extractRequestMethod(fn);
             const fnReturnType = extractReturnType(fn);
             const fnParams = extractFunctionParams(fn);
-            // spec.paths["path"]["method"] = OpenAPIProcessor.createPath("path", "GET", fnName);
+
+            if (fnReturnType.array) {
+              Object.assign(spec.components.schemas,
+                OpenAPIProcessor.createArrayComponent(Util.pluralise(fnReturnType.name), fnReturnType.name));
+            }
+
             spec.paths = _.merge(OpenAPIProcessor.createPath(fnPath, fnMethod, fnName), spec.paths);
-            spec.paths[fnPath][fnMethod].responses = OpenAPIProcessor.createResponse(fnReturnType);
+            spec.paths[fnPath][fnMethod].responses = OpenAPIProcessor.createResponse(fnReturnType.name, fnReturnType.array);
+
             if (fnParams) {
                 spec.paths[fnPath][fnMethod].parameters = fnParams.map((param) => {
                   return OpenAPIProcessor.createRequestParameter(param.paramName, param.paramType)
@@ -90,10 +92,10 @@ export module RustServerProcessor {
         }
     }
 
-    function extractReturnType(spec: {}): string {
+    function extractReturnType(spec: {}): { name: string, array: boolean } {
         let responses = select(spec, '$.output..ident');
         if (responses) {
-            return responses.pop();
+            return { name: responses.pop(), array: Util.arrayIncludes("Vec", responses)};
         };
     }
 
@@ -116,7 +118,6 @@ export module RustServerProcessor {
 
         // add models to the ast
         OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
-            // console.log(componentName, component);
             let properties = OpenAPIProcessor.selectComponentProperties(component).map(({ name, type }) => {
                 const optional = Util.arrayIncludes(name, component.required);
                 return createClassField(name, fromType(type), optional);
@@ -127,17 +128,22 @@ export module RustServerProcessor {
 
         // add requests to the ast
         OpenAPIProcessor.eachRequest(spec, (requestName, requestMethod, requestPath, request) => {
+            console.log("OpenAPIProcessor->request", spec, requestName, requestMethod, requestPath, request);
             let params = OpenAPIProcessor.selectRequestParams(request).map(({name, type}) => {
                 return createFunctionParam(name, fromType(type));
             });
             let requestCallStatement = createRequestCall(requestPath, requestMethod);
-            console.log("requestCallStatement", requestCallStatement);
-            ast.items.push(createFunction(requestName, params, [
+            var returnObject = OpenAPIProcessor.extractReturnType(request, spec);
+
+            let fn = createFunction(requestName, params, [
               requestCallStatement
-            ], OpenAPIProcessor.extractReturnType(request)));
+            ], returnObject);
+
+            console.log("made fn:", fn);
+
+            ast.items.push(fn);
         })
 
-        // currentast = ast;
         return ast;
     }
 
@@ -156,15 +162,21 @@ export module RustServerProcessor {
         };
     }
 
-    function createFunction(functionName: string, params: [], content: {}, returnType: string): {} {
-        return {
+    function createFunction(functionName: string, params: [], content: {}, returnType: {type: string, array: boolean}): { fn: {} } {
+        // console.log("createFunction()", returnType);
+        let rt = {
             "fn": {
                 "ident": functionName,
                 "stmts": content,
-                "inputs": params,
-                "output": createFunctionReturnType(returnType, "ApiBase"),
+                "inputs": params
             }
         };
+
+        if (returnType) {
+          rt.fn["output"] = createFunctionReturnType(returnType.type, "ApiBase", returnType.array);
+        };
+
+        return rt;
     }
 
     function createRequestCall(requestPath: string, requestMethod: string) {
@@ -199,49 +211,42 @@ export module RustServerProcessor {
         }
       };
     }
-
-    function createFunctionReturnType(type: string, bracketType: string): {} {
-        return {
-            "path": {
-              "segments": [
-                {
-                  "arguments": {
-                    "angle_bracketed": {
-                      "args": [
-                        {
-                          "type": {
-                            "path": {
-                              "segments": [
-                                {
-                                  "ident": type
-                                }
-                              ]
-                            }
-                          }
-                        }
-                      ]
+    
+    function wrapFunctor(name: string, content: {}): {} {
+      return { "path": {
+          "segments": [
+            {
+              "arguments": {
+                "angle_bracketed": {
+                  "args": [
+                    {
+                      "type": content
                     }
-                  },
-                  "ident": bracketType
+                  ]
                 }
-              ]
+              },
+              "ident": name
             }
-          };
+          ]
+        }
+      };
     }
 
-    // // reads a openapi spec, returns rust ast 
-    // export async function generate(spec: {}): Promise<{}> {
-    //     console.log("RustServerProcessor.generate()");
+    function createFunctionReturnType(type: string, bracketType: string, array: boolean): {} {
+      var innerType: {} = {"path": {
+        "segments": [
+          {
+            "ident": type
+          }
+        ]
+      }};
 
-    //     let ast = { items: [] };
-    //     // OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
-    //     //     console.log(componentName, component);
-    //     //     // add models to the ast
-    //     //     ast.items.push(createClass(componentName));
-    //     // });
-
-    //     return ast;
-    // }
+      if (array == true) {
+        innerType = wrapFunctor("Vec", innerType);
+      }
+      
+      return wrapFunctor(bracketType, innerType);
+    }
 
     /// convert from openapi type to rust type
     function fromType(type: string): string {
@@ -319,20 +324,6 @@ export module RustServerProcessor {
               }
             }
         };
-        // return {
-        //     "vis": "pub",
-        //     "ident": name,
-        //     "colon_token": true,
-        //     "ty": {
-        //       "path": {
-        //         "segments": [
-        //           {
-        //             "ident": type
-        //           }
-        //         ]
-        //       }
-        //     }
-        // };
     }
 }
 
@@ -342,6 +333,5 @@ function transform(json:any, transform: string): {} {
 
 function select(json: any, path: string) {
     const selector = JSONPath({path: path, json: json, wrap: false});
-    // console.log('select():', selector);
     return selector;
 }

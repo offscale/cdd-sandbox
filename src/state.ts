@@ -41,21 +41,6 @@ export module State {
         }
       ];
       this.services = { // delete this stuff
-        openapi: {
-          server: "ws://localhost:7777",
-          syntax: "yaml",
-          code: ""
-        },
-        // typescript: {
-        //   server: "ws://localhost:7778",
-        //   syntax: "typescript",
-        //   code: ""
-        // },
-        rust: {
-          server: "ws://localhost:7779",
-          syntax: "rust",
-          code: ""
-        }
       };
     }
 
@@ -109,7 +94,9 @@ export module State {
             // deserialise each ast to code
             Methods.deserialise(backgroundProject.processor.server, backgroundProject.ast).then((result) => {
               console.log("State.save->Methods.serialise->Methods.deserialise = ", arrrrr, backgroundProject, result, this);
-              arrrrr.code = result["output"];
+              if (result) {
+                arrrrr.code = result["output"];
+              }
             });
           }
         }

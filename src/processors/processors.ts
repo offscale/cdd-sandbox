@@ -13,9 +13,9 @@ import { RustServerProcessor } from "./rust-server";
 
 export module Processors {
     export let services = {
-        "rust": "ws://localhost:7779",
-        "typescript": "ws://localhost:7778",
-        "openapi": "ws://localhost:7777"
+        "rust": "ws://172.105.183.189/rust",
+        "typescript": "ws://172.105.183.189/rust",
+        "openapi": "ws://172.105.183.189/openapi"
     };
     export let processors = {
         "typescript-client": {

@@ -9,7 +9,7 @@
     "rpc-websocket-client": "^1.1.4"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --progress --colors --config webpack.config.js",
     "server": "http-server",
     "clean": "rm -rf public/* && rm -rf build/*",
     "start": "webpack-dev-server --watch --debug --devtool source-map --output-pathinfo --progress --colors --config webpack.config.js --host 0.0.0.0"

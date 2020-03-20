@@ -1,6 +1,7 @@
 import { Models } from "../models";
 import { Methods } from "../methods";
 import { Util } from "../utils";
+import { ErrorBar } from "../error";
 
 const { JSONPath } = require('jsonpath-plus');
 // import * as _ from "lodash";
@@ -17,13 +18,13 @@ export module OpenAPIProcessor {
         console.log("-> OpenAPIProcessor.merge()", left, right);
         // Object.assign(left, right);
         // return right;
-        Object.assign(left["components"], right["components"]);
+        // Object.assign(left["components"], right["components"]);
+        left.components = right.components;
+        left.paths = right.paths;
+
+        // Object.assign(left, right);
+
         console.log("<- OpenAPIProcessor.merge()", left);
-        // left.components = right.components;
-        // left.paths = right.components;
-
-        Object.assign(left, right);
-
         return left;
     }
 
@@ -53,11 +54,38 @@ export module OpenAPIProcessor {
         }
     }
 
-    export function extractReturnType(spec: {}): string {
-        let responses = select(spec, '$.responses..schema.$ref');
+    export function extractReturnType(request: {}, spec: {}): { type: string, array: boolean } {
+        console.log("-> extractReturnType()", request, spec);
+        let responses = select(request, '$.responses..schema.$ref');
         if (responses) {
-            return extractTypeFromRef(responses[0]);
+            let refType = extractTypeFromRef(responses[0]);
+            let componentType = extractComponentType(spec, refType);
+
+            if (componentType) {
+                console.log("<- extractReturnType()", { type: componentType.type, array: componentType.array });
+                return { type: componentType.type, array: componentType.array };
+            }
         }
+    }
+
+    export function extractComponentType(spec: {}, componentName: string): any {
+        console.log("-> extractComponentType()", spec, componentName);
+        let components = select(spec, '$..components.schemas');
+        for (const ident in components) {
+            console.log("--5555", ident, componentName, components[componentName]);
+            if (ident == componentName) {
+                const component = components[componentName];
+
+                if (component.type == "array") {
+                    // todo: check if item is valid?
+                    const returnType = extractTypeFromRef(component.items["$ref"]);
+                    if (returnType) {
+                        return { type: returnType, array: true };
+                    }
+                }
+                return { type: componentName, array: false };
+            };
+        };
     }
 
     // extract a type from a ref string eg: 
@@ -107,7 +135,7 @@ export module OpenAPIProcessor {
         };
     }
 
-    export function createComponent(componentName: string) {
+    export function createObjectComponent(componentName: string) {
         return {
             [componentName]: {
                 type: "object",
@@ -117,13 +145,26 @@ export module OpenAPIProcessor {
         };
     }
 
-    export function createResponse(responseType: string): {} {
+    export function createArrayComponent(pluralName: string, singularName: string) {
         return {
-            default: {
+            [pluralName]: {
+                type: "array",
+                items: {
+                    $ref: `#/components/schemas/${singularName}`
+                }
+            }
+        };
+    }
+
+    export function createResponse(responseType: string, array: boolean): {} {
+        console.log("createResponse", responseType, array);
+        let response = array ? Util.pluralise(responseType) : responseType;
+        return {
+            "200": {
                 content: {
                     ["application/json"]: {
                         schema: {
-                            "$ref": `#/components/schemas/${responseType}`
+                            "$ref": `#/components/schemas/${response}`
                         }
                     }
                 }

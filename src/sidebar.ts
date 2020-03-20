@@ -25,10 +25,16 @@ export module Sidebar {
     let requestsContainer = document.querySelector(requestsSelector);
     OpenAPIProcessor.eachRequest(spec, (requestName, requestMethod, requestPath, request) => {
       let requestEl = createRequest(requestName, requestMethod, requestPath);
+      
       OpenAPIProcessor.eachRequestParam(request, (paramName, paramType, optional) => {
         requestEl.appendChild(createVariable(paramName, paramType, optional));
-      })
-      requestEl.appendChild(createReturn(OpenAPIProcessor.extractReturnType(request), false));
+      });
+
+      let returnType = OpenAPIProcessor.extractReturnType(request, spec);
+      if (returnType) {
+        requestEl.appendChild(createReturn(returnType.type, false, returnType.array));
+      }
+      
       requestsContainer.appendChild(requestEl);
     });
   }
@@ -64,11 +70,12 @@ export module Sidebar {
     );
   }
 
-  function createReturn(varType: string, optional: boolean) {
+  function createReturn(varType: string, optional: boolean, array: boolean) {
+    const text = array ? `-> [${varType}]` : `-> ${varType}`;
     return DOM.createElement(
       "div",
       ["return"],
-      document.createTextNode(`-> ${varType}`)
+      document.createTextNode(text)
     )
   }
 
