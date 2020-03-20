@@ -5,10 +5,9 @@ import { UI } from "./ui";
 
 export module Window {
   export function onLoad(ev: Event) {
-    console.log("window loaded");
+    console.log("Window.onLoad()");
     let appState = new State.AppState(Editor.init());
     Tabs.init(appState); // draw tabs based on config
-    // appState.save();
     UI.update(appState);
     appState.save();
     
@@ -25,17 +24,9 @@ export module Window {
 
         // keypress of ctrl+s
         if (event.ctrlKey && (keyName == "s" || keyName == "S")) {
-          // let selectedService = appState.services[appState.selectedTab];
           let currentProject = appState.currentProject();
           appState.save();
-
           UI.update(appState);
-
-          // let ast = Methods.serialise(currentProject.processor.server, currentProject.code);
-          // currentProject.ast = ast;
-          // State.save();
-          // Methods.parse(selectedService, appState);
-          // Methods.serialise();
           event.preventDefault();
         }
       },

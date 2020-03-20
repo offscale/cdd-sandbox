@@ -1,18 +1,9 @@
-import { Models } from "../models";
-import { Methods } from "../methods";
 import { Util } from "../utils";
-import { ErrorBar } from "../error";
 
 const { JSONPath } = require('jsonpath-plus');
-// import * as _ from "lodash";
 const nodejq = require("jq-in-the-browser").default;
 
 export module OpenAPIProcessor {
-    // parse code into ast
-    export async function parse(code: string) {
-
-    }
-
     // right is new spec, left previous
     export function merge(left: any, right: any) {
         console.log("-> OpenAPIProcessor.merge()", left, right);
@@ -72,12 +63,10 @@ export module OpenAPIProcessor {
         console.log("-> extractComponentType()", spec, componentName);
         let components = select(spec, '$..components.schemas');
         for (const ident in components) {
-            console.log("--5555", ident, componentName, components[componentName]);
             if (ident == componentName) {
                 const component = components[componentName];
 
                 if (component.type == "array") {
-                    // todo: check if item is valid?
                     const returnType = extractTypeFromRef(component.items["$ref"]);
                     if (returnType) {
                         return { type: returnType, array: true };
@@ -193,34 +182,6 @@ export module OpenAPIProcessor {
                 type: propertyType
             }
         }
-    }
-
-    export async function getProject(code: string): Promise<Models.Project> {
-        return await Methods.serialise(this.server, code).then((response) => {
-
-            var models = [];
-            for (const components of select(response, '$..components.schemas')) {
-                for (const modelName in components) {
-                    if (components[modelName].type == "object") {
-                        const properties = components[modelName].properties;
-                        var variables = [];
-    
-                        for (const variableName in properties) {
-                            const variable = properties[variableName];
-    
-                            variables.push({name: variableName, type: variable.type});
-                        };
-    
-                        models.push({name: modelName, vars: variables});
-                    }
-                }
-            }
-
-            return {
-                models: models,
-                requests: [],
-            };
-        });
     }
 }
 

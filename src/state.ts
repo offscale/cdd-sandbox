@@ -1,15 +1,12 @@
-import { Models } from "./models";
 import { Processors } from "./processors/processors";
 import { UI } from "./ui";
 import { Methods } from "./methods";
 import { OpenAPIProcessor } from "./processors/openapi";
 
 export module State {
-
   export class AppState {
     selectedTab: string;
     editor: any;
-    project: Models.Project;
     spec: {};
     services: any;
     projects: any;
@@ -18,10 +15,6 @@ export module State {
       this.selectedTab = "openapi";
       this.editor = editor;
       this.spec = {"openapi":"3.0.0","info":{"title":"Swagger Petstore","license":{"name":"MIT"},"version":"1.0.0"},"servers":[{"url":"http://petstore.swagger.io/v1"}],"paths":{"/pets":{"get":{"tags":["pets"],"summary":"List all pets","operationId":"listPets","parameters":[{"in":"query","name":"limit","description":"How many items to return at one time (max 100)","schema":{"type":"integer","format":"int32"},"style":"form"}],"responses":{"default":{"description":"unexpected error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}},"200":{"description":"A paged array of pets","headers":{"x-next":{"description":"A link to the next page of responses","style":"simple","schema":{"type":"string"}}},"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pets"}}}}}},"post":{"tags":["pets"],"summary":"Create a pet","operationId":"createPets","responses":{"default":{"description":"unexpected error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}},"201":{"description":"Null response"}}}},"/pets/{petId}":{"get":{"tags":["pets"],"summary":"Info for a specific pet","operationId":"showPetById","parameters":[{"in":"path","name":"petId","description":"The id of the pet to retrieve","required":true,"schema":{"type":"string"},"style":"simple"}],"responses":{"default":{"description":"unexpected error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}},"200":{"description":"Expected response to a valid request","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pet"}}}}}}}},"components":{"schemas":{"Pet":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"name":{"type":"string"},"tag":{"type":"string"}},"required":["id","name"]},"Pets":{"type":"array","items":{"$ref":"#/components/schemas/Pet"}},"Error":{"type":"object","properties":{"code":{"type":"integer","format":"int32"},"message":{"type":"string"}},"required":["code","message"]}}}};
-      this.project = {
-        models: [],
-        requests: []
-      };
       this.projects = [
         {
           name: "openapi",
@@ -40,8 +33,6 @@ export module State {
           code: "use diesel::Queryable;\n\n#[derive(Queryable, Debug)]\npub struct Pet {\n\tpub id: i32,\n\tpub name: String,\n\tpub tag: String,\n}\n\n#[derive(Queryable, Debug)]\npub struct Error {\n\tpub code: i32,\n\tpub message: String,\n}\n\npub fn listPets(limit: String) -> ApiResult<Error> {\n    ApiBase::call(\"GET\", \"/pets\", vec![(\"limit\", limit)])\n}\n\n\npub fn createPets() -> ApiResult<Error> {\n    ApiBase::call(\"POST\", \"/pets\", vec![])\n}\n\n\npub fn showPetById(petId: String) -> ApiResult<Error> {\n    ApiBase::call(\"GET\", \"/pets/{petId}\", vec![(\"petId\", petId)])\n}\n" // mostly a cache for tab switching
         }
       ];
-      this.services = { // delete this stuff
-      };
     }
 
     currentProject() {
@@ -104,28 +95,6 @@ export module State {
         // finally refresh the display
         UI.update(this);
       });
-
-      // // modify main openapi spec to reflect changes
-
-      // // update the sidebar (this is incorrect, directly call Sidebar.update(spec))
-      // currentProject.processor.getProject(currentProject.code).then((project) => {
-      //   this.project = project;
-
-      //   Processors.sync();
-      //   UI.update(this);
-      // });
-
-      // // 
-      // for (var project of this.projects) {
-      //   console.log("gggg", this);
-        
-
-      //   // send spec to every project, to update their ast
-      //   // deserialise each ast to code
-      //   project.processor.generate(this.spec).then((code) => {
-      //     project.code = code;
-      //   });
-      // }
     }
   }
 }

@@ -1,4 +1,3 @@
-import { Models } from "./models";
 import { State } from "./state";
 
 var ace = require("brace");
