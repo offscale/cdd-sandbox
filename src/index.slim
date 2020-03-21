@@ -2,7 +2,7 @@ doctype html
 html
   head
     title CDD Sandbox
-    script src="app.js"
+    script src="app.bundle.js"
     link rel="stylesheet" href="style.css"
     / link rel="preload" crossorigin="" href="fonts/Roboto-Regular.woff2" as="font"
 
@@ -20,6 +20,6 @@ html
         .sidebar--title
           | Requests
         .sidebar--items.requests
-      #editor.column
+      #editor-container.column
         #errors
-        #javascript-editor
+        #editor
