@@ -2,11 +2,20 @@ doctype html
 html
   head
     title CDD Sandbox
-    script src="app.bundle.js"
+    
+
+
     link rel="stylesheet" href="style.css"
     / link rel="preload" crossorigin="" href="fonts/Roboto-Regular.woff2" as="font"
 
   body
+    script type="text/javascript" src="app.bundle.js"
+    script type="text/javascript" src="editor.worker.bundle.js"
+    script type="text/javascript" src="json.worker.bundle.js"
+    script type="text/javascript" src="css.worker.bundle.js"
+    script type="text/javascript" src="html.worker.bundle.js"
+    script type="text/javascript" src="ts.worker.bundle.js"
+
     section.header Compiler Driven Development
 
     section.tab-bar

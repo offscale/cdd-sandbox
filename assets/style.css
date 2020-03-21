@@ -25,6 +25,7 @@ body {
 #editor {
   flex-grow: 1;
   height: 100%;
+  width: 800px;
 }
 .content {
   height: 100%;

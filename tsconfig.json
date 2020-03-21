@@ -4,10 +4,9 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es5",
-
+    "outDir": "build",
     "esModuleInterop": true,
-    "removeComments": true,
-    "outDir": "build"
+    "removeComments": true
   },
   //   "files": ["src/app.ts"]
   "include": ["src/**/*"],

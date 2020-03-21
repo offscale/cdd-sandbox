@@ -1,7 +1,6 @@
 const path = require("path");
+const HtmlWebPackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const distFolder = path.resolve(__dirname, "public");
-// const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
   mode: "development",
@@ -19,7 +18,7 @@ module.exports = {
   output: {
     globalObject: "self",
     filename: "[name].bundle.js",
-    path: distFolder
+    path: path.resolve(__dirname, "public")
   },
   module: {
     rules: [
@@ -27,6 +26,10 @@ module.exports = {
         test: /\.ts?$/,
         use: "ts-loader",
         exclude: /node_modules/
+      },
+      {
+        test: /\.html?$/,
+        loader: 'html-loader'
       },
       {
         test: /\.css$/,
@@ -47,6 +50,12 @@ module.exports = {
       {
         test: /\.ttf$/,
         use: ['file-loader']
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/,
+        loaders: [
+            'file-loader?hash=sha512&digest=hex&name=[hash].[ext]'
+        ]
       }
     ]
   },
@@ -54,8 +63,12 @@ module.exports = {
     new CopyWebpackPlugin([
       {
         from: "assets",
-        to: distFolder
+        to: path.resolve(__dirname, "public")
       }
-    ])
+    ]),
+    // new HtmlWebPackPlugin({
+    //   title: "CDD Sandbox",
+    //   template: './public/index.html'
+    // })
   ]
 };
