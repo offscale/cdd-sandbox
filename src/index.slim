@@ -2,9 +2,6 @@ doctype html
 html
   head
     title CDD Sandbox
-    
-
-
     link rel="stylesheet" href="style.css"
     / link rel="preload" crossorigin="" href="fonts/Roboto-Regular.woff2" as="font"
 
@@ -21,14 +18,16 @@ html
     section.tab-bar
       .tab-bar--tab.new-project +
         
-    section.content
-      #sidebar.column
+    section.columns
+      #sidebar.column-sm
         .sidebar--title
           | Models
         .sidebar--items.models
         .sidebar--title
           | Requests
         .sidebar--items.requests
-      #editor-container.column
+      #editor-container.column-lg
         #errors
-        #editor
+        .columns
+          #editor
+          #ast

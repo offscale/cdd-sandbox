@@ -13,7 +13,7 @@ export module State {
 
     constructor(editor: any) {
       this.selectedTab = "openapi";
-      // this.editor = editor;
+      this.editor = editor;
       this.spec = {"openapi":"3.0.0","info":{"title":"Swagger Petstore","license":{"name":"MIT"},"version":"1.0.0"},"servers":[{"url":"http://petstore.swagger.io/v1"}],"paths":{"/pets":{"get":{"tags":["pets"],"summary":"List all pets","operationId":"listPets","parameters":[{"in":"query","name":"limit","description":"How many items to return at one time (max 100)","schema":{"type":"integer","format":"int32"},"style":"form"}],"responses":{"default":{"description":"unexpected error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}},"200":{"description":"A paged array of pets","headers":{"x-next":{"description":"A link to the next page of responses","style":"simple","schema":{"type":"string"}}},"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pets"}}}}}},"post":{"tags":["pets"],"summary":"Create a pet","operationId":"createPets","responses":{"default":{"description":"unexpected error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}},"201":{"description":"Null response"}}}},"/pets/{petId}":{"get":{"tags":["pets"],"summary":"Info for a specific pet","operationId":"showPetById","parameters":[{"in":"path","name":"petId","description":"The id of the pet to retrieve","required":true,"schema":{"type":"string"},"style":"simple"}],"responses":{"default":{"description":"unexpected error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Error"}}}},"200":{"description":"Expected response to a valid request","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Pet"}}}}}}}},"components":{"schemas":{"Pet":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"name":{"type":"string"},"tag":{"type":"string"}},"required":["id","name"]},"Pets":{"type":"array","items":{"$ref":"#/components/schemas/Pet"}},"Error":{"type":"object","properties":{"code":{"type":"integer","format":"int32"},"message":{"type":"string"}},"required":["code","message"]}}}};
       this.projects = [
         {
@@ -54,7 +54,7 @@ export module State {
       // console.log("currentProject:", currentProject);
 
       // save the current tab's code (THIS SHOULD HAPPEN ONLY ON VALID CODE)
-      // currentProject.code = this.editor.getValue();
+      currentProject.code = this.editor.getValue();
 
       // try to convert to ast via service adaptor
       Methods.serialise(currentProject.processor.server, currentProject.code).then((result) => {

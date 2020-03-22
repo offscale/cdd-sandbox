@@ -11,4 +11,9 @@ export module DOM {
     }
     return element;
   }
+
+  export function setTextOf(selector, content) {
+    let el = document.getElementById(selector);
+    el.textContent = content;
+  }
 }

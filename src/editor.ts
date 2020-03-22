@@ -1,18 +1,10 @@
 import * as monaco from "monaco-editor";
-
 import { State } from "./state";
-import { Domain } from "domain";
 import { DOM } from "./dom";
 
-// var ace = require("brace");
-// require("brace/mode/javascript");
-// require("brace/mode/yaml");
-// require("brace/mode/typescript");
-// require("brace/mode/rust");
-// require("brace/mode/swift");
-// require("brace/theme/monokai");
-
 let editorId = "editor";
+let astId = "ast";
+let astEditor;
 
 // @ts-ignore
 self.MonacoEnvironment = {
@@ -32,45 +24,44 @@ self.MonacoEnvironment = {
     return "./editor.worker.bundle.js";
   }
 };
-// import * as monaco from "monaco-editor";
-// import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
-// import * as _ from "lodash";
-// const { JSONPath } = require('jsonpath-plus');
-// const nodejq = require("jq-in-the-browser").default;
-// import monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
-
-// monaco.editor.create(document.body, {
-//   value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
-//   language: "typescript"
-// });
-
 
 export module Editor {
   export function init() {
-    // var editor = ace.edit(editorId);
-    // editor.$blockScrolling = Infinity;
-    // editor.setTheme("ace/theme/monokai");
-
-    // let editor = document.querySelector(editorId);
-    
-    // console.log("DOCUMENT", document.getElementById(editorId));
-
-    // monaco.editor.create(document.body);
-    monaco.editor.create(document.getElementById(editorId), {
+    astEditor = monaco.editor.create(document.getElementById(astId), {
       value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
-      language: "typescript"
+      theme: "vs-dark",
+      fontSize: 10,
+      lineNumbers: "off",
+      roundedSelection: false,
+      scrollBeyondLastLine: false,
+      readOnly: false,
+      minimap: {
+        enabled: false
+      },
+      language: "json"
     });
 
-    // return {};
+    return monaco.editor.create(document.getElementById(editorId), {
+      value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
+      theme: "vs-dark",
+      language: "typescript"
+    });
   }
 
   export function update(appState: State.AppState) {
     if (appState.selectedTab) {
       let currentProject = appState.currentProject();
 
-      // appState.editor.getSession().setMode(`ace/mode/${currentProject.syntax}`);
-      // appState.editor.setValue(currentProject.code);
-      // appState.editor.clearSelection();
+      appState.editor.setValue(currentProject.code);
+
+      var model = appState.editor.getModel(); // we'll create a model for you if the editor created from string value.
+      monaco.editor.setModelLanguage(model, currentProject.syntax);
+
+      astEditor.setValue(JSON.stringify(currentProject.ast));
+      // astEditor.getAction('editor.action.format').run();
+      astEditor.getAction('editor.action.formatDocument').run()
+
+      // DOM.setTextOf(astId, JSON.stringify(currentProject.ast));
     }
   }
 }
