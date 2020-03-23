@@ -35,6 +35,7 @@ export module Editor {
       roundedSelection: false,
       scrollBeyondLastLine: false,
       readOnly: false,
+      tabSize: 1,
       minimap: {
         enabled: false
       },
@@ -44,6 +45,7 @@ export module Editor {
     return monaco.editor.create(document.getElementById(editorId), {
       value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
       theme: "vs-dark",
+      tabSize: 2,
       language: "typescript"
     });
   }
@@ -53,13 +55,14 @@ export module Editor {
       let currentProject = appState.currentProject();
 
       appState.editor.setValue(currentProject.code);
+      appState.editor.getAction('editor.action.formatDocument').run();
 
       var model = appState.editor.getModel(); // we'll create a model for you if the editor created from string value.
       monaco.editor.setModelLanguage(model, currentProject.syntax);
 
       astEditor.setValue(JSON.stringify(currentProject.ast));
       // astEditor.getAction('editor.action.format').run();
-      astEditor.getAction('editor.action.formatDocument').run()
+      astEditor.getAction('editor.action.formatDocument').run();
 
       // DOM.setTextOf(astId, JSON.stringify(currentProject.ast));
     }
