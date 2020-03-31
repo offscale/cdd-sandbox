@@ -139,8 +139,6 @@ export module RustServerProcessor {
               requestCallStatement
             ], returnObject);
 
-            console.log("made fn:", fn);
-
             ast.items.push(fn);
         })
 

@@ -1,5 +1,6 @@
 import { OpenAPIProcessor } from "./openapi";
 import { RustServerProcessor } from "./rust-server";
+import { TypescriptClientProcessor } from "./typescript";
 
 // tip: use https://jsonpath.com/ and https://duckduckgo.com/?q=json+format https://github.com/s3u/JSONPath
 // json templating: https://www.npmjs.com/package/jsonpath-object-transform
@@ -9,13 +10,22 @@ import { RustServerProcessor } from "./rust-server";
 export module Processors {
     export let services = {
         "rust": "ws://172.105.183.189/rust",
-        "typescript": "ws://172.105.183.189/rust",
-        "openapi": "ws://172.105.183.189/openapi"
+        "typescript": "ws://172.105.183.189/typescript",
+        "openapi": "ws://172.105.183.189/openapi",
+        "swift": "ws://127.0.0.1:7781"
     };
     export let processors = {
+        "swift-client": {
+            server: services.swift,
+            syntax: "swift",
+            extractSpec: TypescriptClientProcessor.extractSpec,
+            merge: TypescriptClientProcessor.merge,
+        },
         "typescript-client": {
             server: services.typescript,
-            syntax: "typescript"
+            syntax: "typescript",
+            extractSpec: TypescriptClientProcessor.extractSpec,
+            merge: TypescriptClientProcessor.merge,
         },
         "rust-server": {
             server: services.rust,
@@ -27,7 +37,7 @@ export module Processors {
             server: services.openapi,
             syntax: "yaml",
             extractSpec: OpenAPIProcessor.extractSpec,
-            merge: OpenAPIProcessor.merge
+            merge: OpenAPIProcessor.merge,
         },
     };
 }

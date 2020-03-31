@@ -54,15 +54,17 @@ export module Editor {
     if (appState.selectedTab) {
       let currentProject = appState.currentProject();
 
-      appState.editor.setValue(currentProject.code);
-      appState.editor.getAction('editor.action.formatDocument').run();
-
       var model = appState.editor.getModel(); // we'll create a model for you if the editor created from string value.
       monaco.editor.setModelLanguage(model, currentProject.syntax);
 
+      appState.editor.setValue(currentProject.code);
+      appState.editor.getAction('editor.action.formatDocument').run();
+
       astEditor.setValue(JSON.stringify(currentProject.ast));
       // astEditor.getAction('editor.action.format').run();
-      astEditor.getAction('editor.action.formatDocument').run();
+      if (appState.currentProject().syntax == "typescript") {
+        astEditor.getAction('editor.action.formatDocument').run();
+      };
 
       // DOM.setTextOf(astId, JSON.stringify(currentProject.ast));
     }

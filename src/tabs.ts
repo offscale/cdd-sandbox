@@ -46,7 +46,7 @@ export module Tabs {
             state.projects.push({
               name: "typescript",
               description: "Web Frontend (Typescript)",
-              processor: Processors.processors["openapi"],
+              processor: Processors.processors["typescript-client"],
               syntax: "typescript",
               ast: {},
               code: "function main() { }",
