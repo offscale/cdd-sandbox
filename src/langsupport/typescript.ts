@@ -52,6 +52,7 @@ export module TypescriptGenerator {
             "parameters": args,
 			"body": {
                 "kind": 222,
+                "multiLine": true,
                 "statements": []
             }
         };
