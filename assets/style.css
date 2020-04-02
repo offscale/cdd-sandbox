@@ -94,6 +94,7 @@ section {
   /* width: 250px; */
   height: 100%;
   padding: 20px 0;
+  min-width: 300px;
 }
 .sidebar--title {
   color: rgb(192, 186, 175);

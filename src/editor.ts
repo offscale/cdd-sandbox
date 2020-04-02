@@ -36,6 +36,7 @@ export module Editor {
       scrollBeyondLastLine: false,
       readOnly: false,
       tabSize: 1,
+      automaticLayout: true,
       minimap: {
         enabled: false
       },
@@ -46,6 +47,7 @@ export module Editor {
       value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
       theme: "vs-dark",
       tabSize: 2,
+      automaticLayout: true,
       language: "typescript"
     });
   }

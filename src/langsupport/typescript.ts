@@ -1,3 +1,22 @@
+const { JSONPath } = require('jsonpath-plus');
+
+function select(json: any, path: string) {
+    return JSONPath({path: path, json: json, wrap: false});
+}
+
+export module TypescriptVisitor {
+    export function eachClass(ast: any, fn: (className) => void) {
+        let classes = select(ast, '$..statements[?(@.kind==244)]..escapedText');
+        for (const className of classes) {
+            fn(className);
+        }
+        // for (const className in select(ast, '$..components.schemas')) {
+        //     if(components[componentName].type == "object") {
+        //         fn(componentName, components[componentName]);
+        //     }
+        // }
+    }
+}
 
 export module TypescriptGenerator {
     // export function createClass(name: string, fields: {}[]): {} {

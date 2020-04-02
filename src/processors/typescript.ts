@@ -1,7 +1,7 @@
 import { OpenAPIProcessor } from "./openapi";
 import { Util } from "../utils";
 import * as _ from "lodash";
-import { TypescriptGenerator } from "../langsupport/typescript";
+import { TypescriptGenerator, TypescriptVisitor } from "../langsupport/typescript";
 
 const { JSONPath } = require('jsonpath-plus');
 const nodejq = require("jq-in-the-browser").default;
@@ -10,7 +10,13 @@ export module TypescriptClientProcessor {
     // generate openapi spec from ast
     export function extractSpec(ast: {}): {} {
         console.log("TypescriptClientProcessor.extractSpec()", ast);
-        return {};
+        let spec = { components: { schemas: {} }, paths: {} };
+        
+        TypescriptVisitor.eachClass(ast, (className) => {
+            Object.assign(spec.components.schemas,
+                OpenAPIProcessor.createObjectComponent(className));
+        })
+        return spec;
     }
     
     // takes an openapi spec, updates ast
