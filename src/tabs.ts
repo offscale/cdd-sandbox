@@ -46,11 +46,13 @@ export module Tabs {
             state.projects.push({
               name: "typescript",
               description: "Web Frontend (Typescript)",
+              loading: true,
               processor: Processors.processors["typescript-client"],
               syntax: "typescript",
               ast: {},
               code: "function main() { }",
             });
+            state.save();
             Tabs.update(state);
             UI.update(state);
           });
@@ -59,13 +61,13 @@ export module Tabs {
 
     export function update(state: State.AppState) {
         document.querySelectorAll(activeTabSelector).forEach(value => {
-            value.classList.remove("active");
-          });
-          if (state.selectedTab) {
-            document
-              .querySelector(`${tabsSelector}.${state.selectedTab}`)
-              .classList.add("active");
-          }
+          value.classList.remove("active");
+        });
+        if (state.selectedTab) {
+          document
+            .querySelector(`${tabsSelector}.${state.selectedTab}`)
+            .classList.add("active");
+        }
     }
 
     export function click(tab: string) {

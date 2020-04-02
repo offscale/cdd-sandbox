@@ -56,8 +56,9 @@ export module Editor {
 
       var model = appState.editor.getModel(); // we'll create a model for you if the editor created from string value.
       monaco.editor.setModelLanguage(model, currentProject.syntax);
+      model.setValue(currentProject.code);
 
-      appState.editor.setValue(currentProject.code);
+      // appState.editor.setValue(currentProject.code);
       appState.editor.getAction('editor.action.formatDocument').run();
 
       astEditor.setValue(JSON.stringify(currentProject.ast));
