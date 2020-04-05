@@ -12,6 +12,8 @@ export module TypescriptVisitor {
         let classes = select(ast, '$..statements[?(@.kind==244)]');
         console.log('classes: ', classes);
 
+        if (!Util.isIterable(classes)) { return; }
+
         for (const klass of classes) {
             let members = [];
             TypescriptVisitor.eachClassMember(klass, (varName, varType, isOptional) => {
@@ -81,7 +83,20 @@ export module TypescriptGenerator {
         }
     }
 
-    export function createClassMemberVariable(name: string, type: string): {} {
+    export function createClassMemberVariable(name: string, type: string, optional: boolean): {} {
+        if (optional == true) {
+            return {
+                "kind": 158,
+                "name": {
+                    "kind": 75,
+                    "escapedText": name
+                },
+                "type": {
+                    "kind": toType(type)
+                }
+            }
+        };
+
         return {
             "kind": 158,
             "name": {
@@ -117,8 +132,8 @@ export module TypescriptGenerator {
         return {};
     }
 
-    export function typeFromOpenAPI(type: string): string {
-        return "string";
+    export function toOpenAPI(ty: number): string {
+        return fromType(ty);
     }
 }
 
@@ -129,6 +144,7 @@ const classDefKind = 244;
 
 function toType(ty: string): number {
     switch (ty) {
+
         case "string":
             return 142;
 
@@ -136,17 +152,21 @@ function toType(ty: string): number {
             return 139;
     
         default:
-            return 142;
+            return 0;
     }
 }
 
 function fromType(ty: number): string {
     switch (ty) {
+
         case 142:
             return "string";
+
+        case 139:
+            return "integer";
     
         default:
-            "string";
+            "error";
     }
 }
 

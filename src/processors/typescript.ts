@@ -15,13 +15,15 @@ export module TypescriptClientProcessor {
         TypescriptVisitor.eachClass(ast, (className, members) => {
             Object.assign(spec.components.schemas,
                 OpenAPIProcessor.createObjectComponent(className));
-            
-            for (const member of members) {
-                if (member.optional) {
-                    spec.components.schemas[className].required.push(member.name);
-                };
-                Object.assign(spec.components.schemas[className].properties,
-                    OpenAPIProcessor.createProperty(member.name, member.type));
+
+            if (Util.isIterable(members)) {
+                for (const member of members) {
+                    if (member.optional) {
+                        spec.components.schemas[className].required.push(member.name);
+                    };
+                    Object.assign(spec.components.schemas[className].properties,
+                        OpenAPIProcessor.createProperty(member.name, member.type));
+                }
             }
         });
 
@@ -44,7 +46,8 @@ export module TypescriptClientProcessor {
                 // return createClassMemberVariable(name, fromType(type), optional);
                 return TypescriptGenerator.createClassMemberVariable(
                     name,
-                    TypescriptGenerator.typeFromOpenAPI(type)
+                    type,
+                    optional
                 );
             });
             
@@ -56,7 +59,7 @@ export module TypescriptClientProcessor {
             let params = OpenAPIProcessor.selectRequestParams(request).map(({name, type}) => {
                 return TypescriptGenerator.createFunctionParam(
                     name,
-                    TypescriptGenerator.typeFromOpenAPI(type)
+                    type
                 );
             });
 
