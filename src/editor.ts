@@ -46,7 +46,7 @@ export module Editor {
     return monaco.editor.create(document.getElementById(editorId), {
       value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
       theme: "vs-dark",
-      tabSize: 2,
+      tabSize: 4,
       automaticLayout: true,
       language: "typescript"
     });

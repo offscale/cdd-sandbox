@@ -1,3 +1,5 @@
+import { match } from "assert";
+
 const { JSONPath } = require('jsonpath-plus');
 
 function select(json: any, path: string) {
@@ -5,16 +7,35 @@ function select(json: any, path: string) {
 }
 
 export module TypescriptVisitor {
-    export function eachClass(ast: any, fn: (className) => void) {
-        let classes = select(ast, '$..statements[?(@.kind==244)]..escapedText');
-        for (const className of classes) {
-            fn(className);
+    export function eachClass(ast: any, fn: (className, members) => void) {
+        let classes = select(ast, '$..statements[?(@.kind==244)]');
+        console.log('classes: ', classes);
+
+        for (const klass of classes) {
+            let members = [];
+            TypescriptVisitor.eachClassMember(klass, (varName, varType, isOptional) => {
+                members.push({
+                    name: varName,
+                    type: varType,
+                    optional: isOptional,
+                });
+            });
+            fn(klass.name.escapedText, members);
         }
-        // for (const className in select(ast, '$..components.schemas')) {
-        //     if(components[componentName].type == "object") {
-        //         fn(componentName, components[componentName]);
-        //     }
-        // }
+    }
+
+    export function eachFunction(ast: any, fn: (fnName) => void) {
+        let fns = select(ast, '$..statements[?(@.kind==243)]..escapedText');
+        for (const fnName of fns) {
+            fn(fnName);
+        }
+    }
+
+    export function eachClassMember(ast: any, fn: (varName, varType, isOptional) => void) {
+        console.log("members", ast);
+        for (const member of ast.members) {
+            fn(member.name.escapedText, fromType(member.type.kind), true);
+        }
     }
 }
 
@@ -47,18 +68,28 @@ export module TypescriptGenerator {
         };
     }
 
-    export function createClass(name: string, fields: {}[]): {} {
+    export function createClass(name: string, members: {}[]): {} {
         return {
             "kind": classDefKind,
             "name": {
                 "kind": 75,
 				"escapedText": name
-            }
+            },
+            "members": members
         }
     }
 
     export function createClassMemberVariable(name: string, type: string): {} {
-        return {};
+        return {
+            "kind": 158,
+            "name": {
+                "kind": 75,
+                "escapedText": name
+            },
+            "type": {
+                "kind": toType(type)
+            }
+        };
     }
 
     export function createFunction(name: string, args: []): {} {
@@ -90,6 +121,29 @@ export module TypescriptGenerator {
 const literalKind = 8;
 const quotedStringKind = 10;
 const classDefKind = 244;
+
+function toType(ty: string): number {
+    switch (ty) {
+        case "string":
+            return 142;
+
+        case "integer":
+            return 139;
+    
+        default:
+            return 142;
+    }
+}
+
+function fromType(ty: number): string {
+    switch (ty) {
+        case 142:
+            return "string";
+    
+        default:
+            "string";
+    }
+}
 
 
 // {
