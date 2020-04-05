@@ -1,6 +1,5 @@
 import * as monaco from "monaco-editor";
 import { State } from "./state";
-import { DOM } from "./dom";
 
 let editorId = "editor";
 let astId = "ast";

@@ -1,4 +1,5 @@
 import { match } from "assert";
+import { Util } from "../utils";
 
 const { JSONPath } = require('jsonpath-plus');
 
@@ -24,17 +25,18 @@ export module TypescriptVisitor {
         }
     }
 
-    export function eachFunction(ast: any, fn: (fnName) => void) {
-        let fns = select(ast, '$..statements[?(@.kind==243)]..escapedText');
-        for (const fnName of fns) {
-            fn(fnName);
-        }
-    }
-
     export function eachClassMember(ast: any, fn: (varName, varType, isOptional) => void) {
         console.log("members", ast);
         for (const member of ast.members) {
             fn(member.name.escapedText, fromType(member.type.kind), true);
+        }
+    }
+
+    export function eachFunction(ast: any, fn: (fnName) => void) {
+        let fns = select(ast, '$..statements[?(@.kind==243)]..escapedText');
+        if (!Util.isIterable(fns)) { return; }
+        for (const fnName of fns) {
+            fn(fnName);
         }
     }
 }
@@ -88,7 +90,10 @@ export module TypescriptGenerator {
             },
             "type": {
                 "kind": toType(type)
-            }
+            },
+            "modifiers": [{
+                "kind": 137
+            }]
         };
     }
 
