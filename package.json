@@ -1,4 +1,8 @@
 {
+  "name": "cdd-sandbox",
+  "description": "CDD RPC Web Sandbox",
+  "version": "0.0.1",
+  "license": "(Apache-2.0 OR MIT)",
   "scripts": {
     "build": "webpack",
     "serve": "http-server",
