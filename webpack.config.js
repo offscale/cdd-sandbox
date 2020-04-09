@@ -5,7 +5,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = {
   mode: "development",
   entry: {
-    app: "./src/app.ts", slim: "./src/index.slim",
+    app: "./src/app.ts", ast: "./src/views/doublepane/index.ts", slim: "./src/index.slim",
     "editor.worker": "monaco-editor/esm/vs/editor/editor.worker.js",
     "json.worker": "monaco-editor/esm/vs/language/json/json.worker",
     "css.worker": "monaco-editor/esm/vs/language/css/css.worker",

@@ -50,6 +50,29 @@ export module TypescriptGenerator {
     // }
     // export function createClassMemberVariable
 
+    export function importStatement() {
+        return {
+            "kind": 253,
+            "importClause": {
+                "kind": 254,
+                "namedBindings": [{
+                    "kind": 256,
+                    "elements": [{
+                        "kind": 257,
+                        "name": {
+                            "kind": 75,
+                            "escapedText": "ApiBase"
+                        }
+                    }]
+                }]
+            },
+            "moduleSpecifier": {
+                "kind": 10,
+                "text": "./apibase.ts"
+            }
+        }
+    }
+
     export function variableAssignment(varName: string, varType: string, varValue: string) {
         return {
             "kind": 224,
@@ -115,15 +138,29 @@ export module TypescriptGenerator {
     export function createFunction(name: string, args: []): {} {
         return {
             "kind": 243,
-            "name": {
-                "kind": 75,
-                "escapedText": name
-            },
+            "name": escapedText(name),
             "parameters": args,
 			"body": {
                 "kind": 222,
                 "multiLine": true,
-                "statements": []
+                "statements": [{
+                    "kind": 225,
+                    "expression": {
+                        "kind": 193,
+                        "expression": escapedText("ApiBase"),
+                        "name": escapedText("call")
+                    },
+                    "arguments": [
+                        {
+                            "kind": 10,
+                            "text": "GET",
+                        },
+                        {
+                            "kind": 10,
+                            "text": "/"
+                        }
+                    ]
+                }]
             }
         };
     }
@@ -168,6 +205,13 @@ function fromType(ty: number): string {
         default:
             "error";
     }
+}
+
+function escapedText(text: string) {
+    return {
+        "kind": 75,
+        "escapedText": text
+    };
 }
 
 

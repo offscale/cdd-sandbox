@@ -1,6 +1,7 @@
 import { OpenAPIProcessor } from "./openapi";
 import { RustServerProcessor } from "./rust-server";
 import { TypescriptClientProcessor } from "./typescript";
+import { SwiftClientProcessor } from "./swift-client";
 
 // tip: use https://jsonpath.com/ and https://duckduckgo.com/?q=json+format https://github.com/s3u/JSONPath
 // json templating: https://www.npmjs.com/package/jsonpath-object-transform
@@ -18,8 +19,8 @@ export module Processors {
         "swift-client": {
             server: servers.swift,
             syntax: "swift",
-            extractSpec: TypescriptClientProcessor.extractSpec,
-            merge: TypescriptClientProcessor.merge,
+            extractSpec: SwiftClientProcessor.extractSpec,
+            merge: SwiftClientProcessor.merge,
         },
         "typescript-client": {
             server: servers.typescript,

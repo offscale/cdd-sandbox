@@ -39,6 +39,8 @@ export module TypescriptClientProcessor {
         console.log("TypescriptClientProcessor.merge()", spec);
         let ast = { statements: [], "kind": 288, "text": "" };
 
+        ast.statements.push(TypescriptGenerator.importStatement());
+
         // add models to the ast
         OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
             let members = OpenAPIProcessor.selectComponentProperties(component).map(({ name, type }) => {

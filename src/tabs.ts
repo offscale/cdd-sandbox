@@ -5,7 +5,7 @@ import { Processors } from "./processors/processors";
 let tabsContainerSelector = ".tab-bar";
 let tabsSelector = ".tab-bar--tab";
 let activeTabSelector = ".tab-bar--tab.active";
-const maxProjects = 3;
+const maxProjects = 4;
 
 // todo: this should not write to state
 
