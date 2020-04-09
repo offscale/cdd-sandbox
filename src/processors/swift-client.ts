@@ -27,7 +27,10 @@ export module SwiftClientProcessor {
                                         
                     case "functionNode":
                         let functionNode = statement["functionNode"];
-                        spec.paths = _.merge(OpenAPIProcessor.createPath("/", "GET", functionNode["ident"]), spec.paths);
+                        let path = functionNode["ident"];
+                        let method = functionNode["ident"];
+
+                        spec.paths = _.merge(OpenAPIProcessor.createPath(path, method, functionNode["ident"]), spec.paths);
                         break;
                 }
             }
@@ -59,11 +62,21 @@ export module SwiftClientProcessor {
         })
 
         OpenAPIProcessor.eachRequest(spec, (requestName, requestMethod, requestPath, request) => {
+            let params = [];
+
+            OpenAPIProcessor.eachRequestParam(request, (paramName, paramType, isOptional) => {
+                params.push({
+                    "ident": paramName,
+                    "type": paramType,
+                    "isOptional": isOptional
+                })
+            });
+
             statements.push({
                 "functionNode": {
                     "ident": requestName,
                     "statements": [],
-                    "params": []
+                    "params": params
                 }
             })
         })
