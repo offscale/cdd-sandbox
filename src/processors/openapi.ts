@@ -134,6 +134,26 @@ export module OpenAPIProcessor {
         };
     }
 
+    export function pushComponent(spec: { components: { schemas: {} } }, componentName: string) {
+        spec.components.schemas[componentName] = {
+            type: "object",
+            properties: {},
+            required: []
+        };
+
+        return;
+    }
+
+    export function pushComponentProperty(spec: { components: { schemas: {} } }, componentName: string, propertyName: string, propertyType: string, isOptional: boolean) {
+        spec.components.schemas[componentName].properties[propertyName] = {
+            type: propertyType
+        };
+    }
+
+    export function pushPath(spec: { paths: {} }) {
+        return;
+    }
+
     export function createArrayComponent(pluralName: string, singularName: string) {
         return {
             [pluralName]: {

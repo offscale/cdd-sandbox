@@ -8,22 +8,32 @@ export module SwiftClientProcessor {
         let spec = { components: { schemas: {} }, paths: {} };
 
         for (const statement of ast.statements) {
-            console.log(Object.keys(statement))
+            console.log("-=---", ast, statement, Object.keys(statement))
             for (const objectType of Object.keys(statement)) {
                 switch (objectType) {
-                    case "functionNode":
-                        let node = statement["functionNode"];
-                        spec.paths = _.merge(OpenAPIProcessor.createPath("/", "GET", node["ident"]), spec.paths);
-                        break;
 
                     case "structNode":
-                        Object.assign(spec.components.schemas,
-                            OpenAPIProcessor.createObjectComponent(statement["structNode"]["ident"]));
+                        let structNode: { ident: string, members: [] } = statement["structNode"];
+
+                        OpenAPIProcessor.pushComponent(spec, structNode.ident);
+
+                        for (const member of structNode["members"]) {
+                            let ident: string = member["ident"];
+                            let type: string = member["type"];
+
+                            OpenAPIProcessor.pushComponentProperty(spec, structNode.ident, ident, type, false);
+                        }
+                        break;
+                                        
+                    case "functionNode":
+                        let functionNode = statement["functionNode"];
+                        spec.paths = _.merge(OpenAPIProcessor.createPath("/", "GET", functionNode["ident"]), spec.paths);
                         break;
                 }
             }
         }
 
+        console.log("SwiftClientProcessor.extractSpec", ast, spec);
         return spec;
     }
 
@@ -31,12 +41,19 @@ export module SwiftClientProcessor {
         let statements = [];
 
         OpenAPIProcessor.eachComponent(spec, (componentName, component) => {
+            var props = [];
+
+            OpenAPIProcessor.eachComponentProperty(component, (propertyName, propertyType, optional) => {
+                props.push({
+                    ident: propertyName,
+                    type: propertyType
+                })
+            });
+            
             statements.push({
                 "structNode": {
                     "ident": componentName,
-                    "members": [
-
-                    ]
+                    "members": props
                 }
             })
         })
@@ -51,6 +68,7 @@ export module SwiftClientProcessor {
             })
         })
 
+        console.log("SwiftClientProcessor.merge", spec, statements);
         return { statements: statements }
     }
 }
