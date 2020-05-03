@@ -13,7 +13,7 @@ export module Processors {
         "rust":         "ws://172.105.183.189/rust",
         "typescript":   "ws://172.105.183.189/typescript",
         "openapi":      "ws://172.105.183.189/openapi",
-        "swift":        "ws://127.0.0.1:7781"
+        "swift":        "ws://172.105.183.189/swift"
     };
     export let processors = {
         "swift-client": {
